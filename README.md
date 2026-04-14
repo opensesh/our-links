@@ -1,5 +1,7 @@
 # Our Links
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 A free, open-source alternative to Linktree built with Next.js 16 and React 19.
 
 This is [Open Session's](https://opensession.co) link portal—a single page showcasing our social links, resources, blog posts, and tech stack. Instead of paying $10-50/month for Linktree Pro, Beacons.ai, or similar services, we built our own and made it open source so you can too.
@@ -119,7 +121,7 @@ bun start        # Start production server
 
 ## License
 
-MIT — use it however you want.
+[Apache 2.0](LICENSE)
 
 ---
 
