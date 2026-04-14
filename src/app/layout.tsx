@@ -5,8 +5,8 @@ import { FaultyTerminalWrapper } from "@/components/FaultyTerminalWrapper";
 
 const GA_MEASUREMENT_ID = "G-VCQFSDNWJN";
 
-// GitHub Pages deploys to /OS_our-links/ subpath in production
-const BASE_PATH = process.env.NODE_ENV === "production" ? "/OS_our-links" : "";
+// GitHub Pages deploys to /our-links/ subpath in production
+const BASE_PATH = process.env.NODE_ENV === "production" ? "/our-links" : "";
 
 export const metadata: Metadata = {
   title: "Our Links - Open Session",
@@ -17,11 +17,11 @@ export const metadata: Metadata = {
       { url: `${BASE_PATH}/favicon.png`, type: "image/png" },
     ],
   },
-  metadataBase: new URL("https://opensesh.github.io/OS_our-links"),
+  metadataBase: new URL("https://opensesh.github.io/our-links"),
   openGraph: {
     title: "Link Portal - Open Session",
     description: "Design systems, AI advice, and insights from Fortune 500 veterans. Free resources, templates, and tools for designers and developers.",
-    url: "https://opensesh.github.io/OS_our-links",
+    url: "https://opensesh.github.io/our-links",
     siteName: "Open Session",
     images: [
       {

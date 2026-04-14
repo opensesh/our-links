@@ -76,9 +76,9 @@ const resourceCards: ResourceCard[] = [
   {
     id: "portfolio",
     badge: { text: "Live", variant: "live" },
-    mediaDefault: "/OS_our-links/images/portfolio-01.jpg",
+    mediaDefault: "/our-links/images/portfolio-01.jpg",
     mediaType: "image",
-    imageHover: "/OS_our-links/images/portfolio-02.jpg",
+    imageHover: "/our-links/images/portfolio-02.jpg",
     title: "Portfolio Template",
     description:
       "Our co-founder's portfolio that helped him land jobs at Google, Salesforce, and other Fortune 500 companies. Open source and ready to customize",
@@ -88,9 +88,9 @@ const resourceCards: ResourceCard[] = [
   {
     id: "design-directory",
     badge: { text: "Live", variant: "live" },
-    mediaDefault: "/OS_our-links/images/design-directory-01.mp4",
+    mediaDefault: "/our-links/images/design-directory-01.mp4",
     mediaType: "video",
-    imageHover: "/OS_our-links/images/design-directory-02.jpg",
+    imageHover: "/our-links/images/design-directory-02.jpg",
     title: "Design Directory",
     description:
       "All of our favorite design tools in one interactive directory. Open-source and ready to adapt for your own creative workflow.",
@@ -101,9 +101,9 @@ const resourceCards: ResourceCard[] = [
   {
     id: "brand-design-system",
     badge: { text: "Live", variant: "live" },
-    mediaDefault: "/OS_our-links/images/brand-design-system-01.jpg",
+    mediaDefault: "/our-links/images/brand-design-system-01.jpg",
     mediaType: "image",
-    imageHover: "/OS_our-links/images/brand-design-system-02.jpg",
+    imageHover: "/our-links/images/brand-design-system-02.jpg",
     title: "Brand Design System",
     description:
       "Comprehensive design system optimized for brand identity in the AI era. Fully configurable with connected variables and ready to customize.",
@@ -113,9 +113,9 @@ const resourceCards: ResourceCard[] = [
   {
     id: "linktree-template",
     badge: { text: "Live", variant: "live" },
-    mediaDefault: "/OS_our-links/images/linktree-template-01.jpg",
+    mediaDefault: "/our-links/images/linktree-template-01.jpg",
     mediaType: "image",
-    imageHover: "/OS_our-links/images/linktree-template-02.jpg",
+    imageHover: "/our-links/images/linktree-template-02.jpg",
     title: "Linktree Template",
     description:
       "A beautiful, customizable link portal template built with Next.js. Open-source and ready to adapt for your own brand.",
@@ -126,9 +126,9 @@ const resourceCards: ResourceCard[] = [
   {
     id: "karimo",
     badge: { text: "Live", variant: "live" },
-    mediaDefault: "/OS_our-links/images/karimo-01.jpg",
+    mediaDefault: "/our-links/images/karimo-01.jpg",
     mediaType: "image",
-    imageHover: "/OS_our-links/images/karimo-02.jpg",
+    imageHover: "/our-links/images/karimo-02.jpg",
     title: "KARIMO",
     description:
       "A framework and Claude Code plug-in for PRD-driven autonomous development. Think of it as plan mode on steroids.",

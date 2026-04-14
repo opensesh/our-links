@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
   output: "export",
 
   // GitHub Pages subpath configuration (only in production)
-  basePath: isProd ? "/OS_our-links" : "",
-  assetPrefix: isProd ? "/OS_our-links/" : "",
+  basePath: isProd ? "/our-links" : "",
+  assetPrefix: isProd ? "/our-links/" : "",
 
   // Disable image optimization for static export
   images: {

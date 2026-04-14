@@ -38,7 +38,7 @@ const techStack: TechItem[] = [
   {
     id: "claude",
     name: "Claude",
-    icon: "/OS_our-links/icons/tech/command/claude.png",
+    icon: "/our-links/icons/tech/command/claude.png",
     url: "https://claude.ai",
     description:
       "Our go-to AI assistant for complex reasoning, planning, research, and creative writing.",
@@ -52,7 +52,7 @@ const techStack: TechItem[] = [
   {
     id: "cursor",
     name: "Cursor",
-    icon: "/OS_our-links/icons/tech/command/cursor.png",
+    icon: "/our-links/icons/tech/command/cursor.png",
     url: "https://cursor.sh",
     description:
       "Our go-to IDE, though we typically use Claude Code as a VS Code extension instead of paying monthly.",
@@ -66,7 +66,7 @@ const techStack: TechItem[] = [
   {
     id: "github",
     name: "GitHub",
-    icon: "/OS_our-links/icons/tech/command/github.png",
+    icon: "/our-links/icons/tech/command/github.png",
     url: "https://github.com",
     description:
       "The standard for version control and coding workflows. All of our codebases live here.",
@@ -80,7 +80,7 @@ const techStack: TechItem[] = [
   {
     id: "figma",
     name: "Figma",
-    icon: "/OS_our-links/icons/tech/command/figma.png",
+    icon: "/our-links/icons/tech/command/figma.png",
     url: "https://figma.com",
     description:
       "Our creative design canvas where we have our main design system and create almost all of our content and visual design.",
@@ -94,7 +94,7 @@ const techStack: TechItem[] = [
   {
     id: "framer",
     name: "Framer",
-    icon: "/OS_our-links/icons/tech/command/framer.png",
+    icon: "/our-links/icons/tech/command/framer.png",
     url: "https://framer.com",
     description:
       "Great for building interactive websites for our clients and our own landing pages and web projects.",
@@ -108,7 +108,7 @@ const techStack: TechItem[] = [
   {
     id: "notion",
     name: "Notion",
-    icon: "/OS_our-links/icons/tech/command/notion.png",
+    icon: "/our-links/icons/tech/command/notion.png",
     url: "https://notion.so",
     description:
       "Our all-in-one workspace for notes, tasks, wikis, and database management.",
@@ -126,7 +126,7 @@ const techStack: TechItem[] = [
   {
     id: "wispr",
     name: "Wispr Flow",
-    icon: "/OS_our-links/icons/tech/command/wispr.png",
+    icon: "/our-links/icons/tech/command/wispr.png",
     url: "https://wispr.ai",
     description:
       "Voice dictation that actually works, helping us capture thoughts at the speed of speech.",
@@ -144,7 +144,7 @@ const techStack: TechItem[] = [
   {
     id: "obsidian",
     name: "Obsidian",
-    icon: "/OS_our-links/icons/tech/command/obsidian.png",
+    icon: "/our-links/icons/tech/command/obsidian.png",
     url: "https://obsidian.md",
     description:
       "We use this free open source tool to quickly view and manage markdown files",
@@ -162,7 +162,7 @@ const techStack: TechItem[] = [
   {
     id: "comet",
     name: "Comet",
-    icon: "/OS_our-links/icons/tech/command/comet.png",
+    icon: "/our-links/icons/tech/command/comet.png",
     url: "https://perplexity.ai/comet",
     description:
       "Our favorite AI browser by Perplexity. We find it incredibly useful for research and browser actions.",
@@ -176,7 +176,7 @@ const techStack: TechItem[] = [
   {
     id: "conductor",
     name: "Conductor",
-    icon: "/OS_our-links/icons/tech/command/conductor.png",
+    icon: "/our-links/icons/tech/command/conductor.png",
     url: "https://www.conductor.build/",
     description:
       "For managing multi-agent workflows with Claude Code in a better UI than most IDEs.",
@@ -190,7 +190,7 @@ const techStack: TechItem[] = [
   {
     id: "premiere",
     name: "Premiere Pro",
-    icon: "/OS_our-links/icons/tech/command/premiere.png",
+    icon: "/our-links/icons/tech/command/premiere.png",
     url: "https://www.adobe.com/products/premiere.html",
     description:
       "Industry standard video editing software for our long-form content production.",
@@ -204,7 +204,7 @@ const techStack: TechItem[] = [
   {
     id: "aftereffects",
     name: "After Effects",
-    icon: "/OS_our-links/icons/tech/command/aftereffects.png",
+    icon: "/our-links/icons/tech/command/aftereffects.png",
     url: "https://www.adobe.com/products/aftereffects.html",
     description:
       "Used for creating complex motion graphics and visual effects in our videos.",
@@ -218,7 +218,7 @@ const techStack: TechItem[] = [
   {
     id: "lightroom",
     name: "Lightroom",
-    icon: "/OS_our-links/icons/tech/command/lightroom.png",
+    icon: "/our-links/icons/tech/command/lightroom.png",
     url: "https://www.adobe.com/products/photoshop-lightroom.html",
     description:
       "Essential for color grading and organizing our photo assets and thumbnails.",
@@ -232,7 +232,7 @@ const techStack: TechItem[] = [
   {
     id: "runway",
     name: "Runway",
-    icon: "/OS_our-links/icons/tech/command/runway.png",
+    icon: "/our-links/icons/tech/command/runway.png",
     url: "https://runway.ml",
     description:
       "AI video generation tool that helps us storyboard and create supplementary footage.",
@@ -247,7 +247,7 @@ const techStack: TechItem[] = [
   {
     id: "openscreen",
     name: "Open Screen",
-    icon: "/OS_our-links/icons/tech/command/openscreen.png",
+    icon: "/our-links/icons/tech/command/openscreen.png",
     url: "https://opensession.co",
     description:
       "A lightweight utility for recording screen captures and sharing quick demos.",
@@ -262,7 +262,7 @@ const techStack: TechItem[] = [
   {
     id: "midjourney",
     name: "Midjourney",
-    icon: "/OS_our-links/icons/tech/command/midjourney.png",
+    icon: "/our-links/icons/tech/command/midjourney.png",
     url: "https://midjourney.com",
     description:
       "Our primary tool for generating creative imagery and conceptual art assets.",

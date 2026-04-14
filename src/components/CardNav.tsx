@@ -209,7 +209,7 @@ export function CardNav() {
               {/* Centered Horizontal Wordmark */}
               <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
                 <img
-                  src="/OS_our-links/images/logo_wordmark_charcoal.svg"
+                  src="/our-links/images/logo_wordmark_charcoal.svg"
                   alt="Open Session"
                   className="h-[32px] sm:h-[36px] w-auto"
                 />

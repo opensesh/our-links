@@ -1,10 +1,10 @@
 /**
- * BRAND-OS CSS Styles (Adapted for OS_our-links)
+ * BRAND-OS CSS Styles (Adapted for our-links)
  *
  * This stylesheet contains all brand CSS custom properties, font declarations,
  * and base styles. Adapted from BOS-3.0 lib/brand-styles/brand.css.
  *
- * Font paths use GitHub Pages basePath: /OS_our-links/fonts/
+ * Font paths use GitHub Pages basePath: /our-links/fonts/
  */
 
 /* ============================================
@@ -72,7 +72,7 @@
 /* Offbit - Accent/Mono Font */
 @font-face {
   font-family: 'Offbit';
-  src: url('/OS_our-links/fonts/OffBit-Regular.woff2') format('woff2');
+  src: url('/our-links/fonts/OffBit-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -80,7 +80,7 @@
 
 @font-face {
   font-family: 'Offbit';
-  src: url('/OS_our-links/fonts/OffBit-Bold.woff2') format('woff2');
+  src: url('/our-links/fonts/OffBit-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -89,7 +89,7 @@
 /* Neue Haas Grotesk Display Pro - Primary Display Font */
 @font-face {
   font-family: 'Neue Haas Grotesk Display Pro';
-  src: url('/OS_our-links/fonts/NeueHaasDisplayRoman.woff2') format('woff2');
+  src: url('/our-links/fonts/NeueHaasDisplayRoman.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -97,7 +97,7 @@
 
 @font-face {
   font-family: 'Neue Haas Grotesk Display Pro';
-  src: url('/OS_our-links/fonts/NeueHaasDisplayMedium.woff2') format('woff2');
+  src: url('/our-links/fonts/NeueHaasDisplayMedium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -105,7 +105,7 @@
 
 @font-face {
   font-family: 'Neue Haas Grotesk Display Pro';
-  src: url('/OS_our-links/fonts/NeueHaasDisplayBold.woff2') format('woff2');
+  src: url('/our-links/fonts/NeueHaasDisplayBold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;

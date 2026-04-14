@@ -188,7 +188,7 @@ export function SubscribeModal({
                 <div className="flex justify-center mb-4">
                   <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--bg-tertiary)] border border-[var(--border-secondary)]">
                     <video
-                      src="/OS_our-links/videos/OS_Monogram_CRT_charcoal_1_compressed.mp4"
+                      src="/our-links/videos/OS_Monogram_CRT_charcoal_1_compressed.mp4"
                       autoPlay
                       loop
                       muted

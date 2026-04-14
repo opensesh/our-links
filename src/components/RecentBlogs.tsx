@@ -84,7 +84,7 @@ export function RecentBlogs() {
     async function loadPosts() {
       try {
         // Derive basePath from current URL for GitHub Pages compatibility
-        // e.g., https://opensesh.github.io/OS_our-links/ -> /OS_our-links
+        // e.g., https://opensesh.github.io/our-links/ -> /our-links
         const basePath = window.location.pathname.replace(/\/$/, "") || "";
         const blogsUrl = `${basePath}/data/blogs.json`;
 

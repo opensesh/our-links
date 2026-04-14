@@ -1,4 +1,4 @@
-# Contributing to OS_our-links
+# Contributing to our-links
 
 ## Development Setup
 
@@ -46,10 +46,10 @@ Since this project uses a `basePath` for GitHub Pages, reference assets with the
 export const metadata: Metadata = {
   icons: {
     icon: [
-      { url: '/OS_our-links/favicon.ico' },
-      { url: '/OS_our-links/icon.svg', type: 'image/svg+xml' },
+      { url: '/our-links/favicon.ico' },
+      { url: '/our-links/icon.svg', type: 'image/svg+xml' },
     ],
-    apple: '/OS_our-links/apple-touch-icon.png',
+    apple: '/our-links/apple-touch-icon.png',
   },
 }
 ```
