@@ -1,31 +1,39 @@
-# BOS 3.0 - Claude Development Guide
+# our-links — Claude Development Guide
 
 ## Project Overview
-Brand Operating System (BOS) 3.0 - AI-powered brand management platform built with Next.js 16+, React 19, TypeScript, and Tailwind CSS. Features multi-model AI chat (Claude, Perplexity), brand knowledge systems, and collaborative workspaces.
+Open Session's link portal — the company's curated link tree at `links.opensession.co`. A small static-ish Next.js 16 site that surfaces our links, free resources, tech stack, and recent blog posts. Built with React 19, TypeScript, Tailwind 4, Framer Motion, and GSAP. Deployed to GitHub Pages with `basePath`-aware asset loading.
+
+This is a public-facing brand surface, not an application — no auth, no database, no API routes. Every change should preserve performance and brand fidelity above all else.
 
 ## Essential Commands
 ```bash
-bun dev          # Start dev server (http://localhost:3000)
+bun dev          # Start dev server (http://localhost:3003)
 bun run build    # Production build
 bun run lint     # ESLint
 ```
 
 ## Tech Stack
-- **Framework**: Next.js 16+ App Router
-- **UI**: React 19 + React Aria Components (accessibility)
-- **Styling**: Tailwind CSS with UUI semantic tokens (CSS variables)
-- **State**: Zustand
-- **Database**: Supabase
-- **AI**: Anthropic SDK (Claude), Perplexity API
+- **Framework**: Next.js 16 App Router (React 19)
+- **Styling**: Tailwind CSS 4 with semantic CSS variables (`src/app/theme.css`, `src/lib/brand-styles/`)
+- **Animation**: Framer Motion (gestures, component animations) + GSAP (timelines, scroll-triggered effects)
+- **Graphics**: OGL (WebGL) for the FaultyTerminal effect — must be lazy-loaded via `next/dynamic`
+- **Icons**: Lucide React (the `Sparkles` icon is permanently banned — see Icon Guidelines below)
+- **Deploy**: GitHub Pages (static export). Asset paths flow through `src/lib/assetPath.ts` for `basePath` correctness.
 
 ## Key Directories
 ```
-app/              # Next.js pages and API routes
-components/ui/    # Design system primitives (buttons, inputs, etc.)
-components/chat/  # Chat interface components
-lib/ai/           # AI provider configs, auto-router, tools
-lib/supabase/     # Database services
-hooks/            # Custom React hooks
+src/
+├── app/                      # Next.js pages, layout, global styles
+│   ├── layout.tsx, page.tsx
+│   ├── globals.css           # imports theme + brand-styles + Tailwind
+│   └── theme.css             # semantic CSS variables
+├── components/               # CardNav, OurLinks, FreeResources,
+│                             # SubscribeModal, TechStack, RecentBlogs,
+│                             # FaultyTerminal{Wrapper}, Footer, ShuffleText
+├── lib/
+│   ├── assetPath.ts          # basePath-aware asset URL helper
+│   └── brand-styles/         # brand.css, typography.css, tokens.json
+└── hooks/                    # useMediaQuery, etc.
 ```
 
 ## Claude Configuration Structure
@@ -44,7 +52,9 @@ The `.claude/` directory is organized for Claude Code CLI compatibility:
 │
 ├── commands/                    # Slash commands (CLI required at root)
 │   ├── README.md
-│   └── restart.md
+│   ├── audit-components.md      # /audit-components — React architecture audit
+│   ├── restart.md
+│   └── test-mcp.md
 │
 ├── plugins/                     # Full capability packages (CLI required at root)
 │   ├── agent-sdk-dev/
@@ -72,7 +82,8 @@ The `.claude/` directory is organized for Claude Code CLI compatibility:
 │
 ├── reference/                   # Documentation
 │   ├── design-system.md         # BOS design system reference
-│   └── mcp-setup.md             # MCP server configuration
+│   ├── mcp-setup.md             # MCP server configuration
+│   └── react-architecture.md    # 7-principle React architecture rules
 │
 └── system/                      # Auto-generated (read-only)
     └── architecture.md          # Codebase architecture
@@ -128,9 +139,10 @@ Some agents live inside plugins as subagents for larger workflows:
 - Use Zod for runtime validation where needed
 
 ### Components
-- Use React Aria Components for accessible primitives
+- Use semantic HTML and native ARIA attributes for accessibility (no React Aria here — we keep the bundle small for a public-facing link portal)
 - Co-locate component-specific types in the same file
 - Prefer composition over prop drilling
+- See [reference/react-architecture.md](./reference/react-architecture.md) for the 7 architecture principles, and run `/audit-components` for a compliance check
 
 ### Styling with CSS Variables
 All colors use semantic CSS variables from `theme.css`:
@@ -348,39 +360,12 @@ This project uses MCP servers to extend Claude's capabilities with external tool
 
 | Server | Purpose |
 |--------|---------|
-| **Supabase** | Database operations, migrations, edge functions |
-| **Vercel** | Deployments, logs, project management |
-| **Figma** | Design context, screenshots, code generation |
-| **Notion** | Documentation, pages, databases |
-| **GitHub** | Repository, issues, PRs, code search |
+| **GitHub** | Repository, issues, PRs, code search — primary tool given the GitHub Pages deploy |
+| **Vercel** | Deployments, logs (if/when we move off GitHub Pages) |
+| **Figma** | Design context, screenshots, code generation for new sections |
+| **Firecrawl** | Web scraping, search, brand audits — see [skills/firecrawl-web-tools.md](./skills/firecrawl-web-tools.md) |
+| **Notion** | Documentation, pages, databases (link source-of-truth, if curated there) |
 
 **For setup instructions, see [reference/mcp-setup.md](./reference/mcp-setup.md)**
 
----
-
-## BOS MCP Server (Outbound)
-
-BOS also exposes its own MCP server for external AI clients to access brand knowledge.
-
-### Available Tools
-
-| Tool | Purpose | When to Use |
-|------|---------|-------------|
-| `search_brand_knowledge` | Semantic search across brand docs | Questions about voice, messaging, philosophy |
-| `get_brand_colors` | Retrieve color palette | "What colors should I use?" |
-| `get_brand_assets` | List logos, fonts, images | "Show me our logos" |
-| `get_brand_guidelines` | Fetch guideline documents | Deep dive into specific guidelines |
-| `search_brand_assets` | Semantic asset search | "Find photos with warm tones" |
-
-### MCP Server Endpoint
-```
-URL: https://bos-3-0.vercel.app/api/mcp
-Transport: streamable-http
-Auth: Bearer token (API key from BOS settings)
-```
-
-### Voice Guidance for AI Assistants
-When using BOS MCP, act as a **brand steward**, not an outside advisor:
-- Use "we" and "our" naturally
-- Integrate brand knowledge seamlessly without clinical prefixes
-- Be helpful and informative while embodying brand voice
+This is a public link portal — there is no Supabase, no auth, and no outbound MCP server exposed by this repo. Brand-knowledge MCP lives in the BOS 3.0 repo, not here.
