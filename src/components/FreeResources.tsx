@@ -592,12 +592,12 @@ export function FreeResources() {
 
   return (
     <>
-      <section className="w-full mt-7 sm:mt-9">
+      <section className="w-full mt-14 sm:mt-18">
         <div className="max-w-[var(--content-max-width)] mx-auto">
           {/* Heading row: title left, sort + filter controls right */}
           <div className="resource-header">
             <h2
-              className="font-sans text-xl font-bold"
+              className="font-sans text-[1.375rem] font-bold"
               style={{ color: "var(--color-vanilla)", fontFamily: "var(--font-sans)" }}
             >
               Free Resources
