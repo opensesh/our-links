@@ -81,37 +81,23 @@ function InstagramIcon() {
 
 function LinkedInIcon() {
   return (
-    <svg
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={assetPath("/icons/social/linkedin.svg")}
+      alt=""
       className="link-icon-svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect x="2" y="9" width="4" height="12" />
-      <circle cx="4" cy="4" r="2" />
-    </svg>
+    />
   );
 }
 
 function MediumIcon() {
   return (
-    <svg
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={assetPath("/icons/social/medium.svg")}
+      alt=""
       className="link-icon-svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <ellipse cx="6.5" cy="12" rx="4.5" ry="6" />
-      <ellipse cx="17" cy="12" rx="2" ry="6" />
-      <line x1="22" y1="6" x2="22" y2="18" />
-    </svg>
+    />
   );
 }
 
@@ -562,7 +548,7 @@ export function CardNav() {
 
             {/* Expanded body: cards + pills */}
             <div ref={cardsRef} className="overflow-hidden">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-4 pb-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-4 pb-7 sm:pb-8">
                 {navCards.map((card) => (
                   <div key={card.id} className="gsap-stagger">
                     <NavCardItem card={card} hoverEnabled={videoEnabled} />
@@ -570,7 +556,7 @@ export function CardNav() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap justify-center gap-2 px-6 sm:px-8 pb-4">
+              <div className="flex flex-wrap justify-center gap-2 px-6 sm:px-8 pb-5 sm:pb-6">
                 {socialLinks.map((link) => (
                   <a
                     key={link.id}

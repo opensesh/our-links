@@ -136,26 +136,26 @@ button,
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: 16px;
+  /* Top corners rounded, bottom flush — keeps the vanilla gradient
+     edge a clean horizontal line, no curve on the bottom corners. */
+  border-radius: 16px 16px 0 0;
   overflow: hidden;
   background: var(--color-charcoal);
   cursor: pointer;
-  outline: 0 solid transparent;
-  outline-offset: -2px;
-  transition: outline-color 0.2s ease, transform 0.2s ease;
+  /* Inset box-shadow gives a stroke that follows the rounded top
+     corners and animates smoothly (outline can't transition width). */
+  box-shadow: inset 0 0 0 0 transparent;
+  transition: box-shadow 0.2s ease;
 }
 
 .nav-image-card:hover,
 .nav-image-card:focus-visible {
-  outline: 2px solid var(--color-aperol);
+  box-shadow: inset 0 0 0 2px var(--color-aperol);
+  outline: none;
 }
 
 .nav-image-card[aria-disabled="true"] {
   cursor: default;
-}
-
-.nav-image-card[aria-disabled="true"] .nav-image-card-label {
-  color: var(--color-aperol);
 }
 
 .nav-image-card video {
@@ -187,10 +187,17 @@ button,
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.nav-image-card:hover .nav-image-card-label,
+.nav-image-card:focus-visible .nav-image-card-label {
+  color: var(--color-aperol);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav-image-card {
+  .nav-image-card,
+  .nav-image-card-label {
     transition: none;
   }
 }
