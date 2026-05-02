@@ -263,13 +263,18 @@ function NavCardItem({ card, hoverEnabled, isPrimed, onPrime }: NavCardItemProps
     };
   }, []);
 
-  // Touch: drive play/pause off the parent-owned `isPrimed` so only one
-  // card is active at a time (iOS chokes on multiple simultaneous videos).
+  // Touch: pause whenever this card stops being primed. Play is NOT
+  // handled here — it's done synchronously in the click handler below
+  // so iOS Safari accepts it as a user gesture (calling play() from an
+  // effect runs after React's render cycle, outside the gesture window,
+  // and iOS silently drops the first such call).
+  // We also gate stopAndReset on prior interaction so the mount-time
+  // run doesn't clobber the #t=0.001 first-frame seek.
+  const hasInteractedRef = useRef(false);
   useEffect(() => {
     if (hoverEnabled) return;
     activeRef.current = isPrimed;
-    if (isPrimed) playFromStart();
-    else stopAndReset();
+    if (!isPrimed && hasInteractedRef.current) stopAndReset();
   }, [isPrimed, hoverEnabled]);
 
   const handleEnter = () => {
@@ -286,11 +291,18 @@ function NavCardItem({ card, hoverEnabled, isPrimed, onPrime }: NavCardItemProps
 
   // Touch tap: first tap primes the card (plays the video and swallows
   // the click); second tap (already primed) falls through to navigation.
+  // play() must be called synchronously here, inside the click event,
+  // or iOS Safari drops the gesture and silently fails to start the
+  // first video. The state update + effect can't do it because they
+  // run after the click event finishes.
   const handleTouchClick = (e: MouseEvent) => {
     if (hoverEnabled) return;
     if (!isPrimed) {
       e.preventDefault();
       e.stopPropagation();
+      hasInteractedRef.current = true;
+      activeRef.current = true;
+      playFromStart();
       onPrime(card.id);
     }
   };
