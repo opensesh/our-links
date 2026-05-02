@@ -8,6 +8,34 @@ const GA_MEASUREMENT_ID = "G-VCQFSDNWJN";
 // GitHub Pages deploys to /our-links/ subpath in production
 const BASE_PATH = process.env.NODE_ENV === "production" ? "/our-links" : "";
 
+const FONT_FACES = `
+@font-face {
+  font-family: 'Offbit';
+  src: url('${BASE_PATH}/fonts/OffBit-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Offbit';
+  src: url('${BASE_PATH}/fonts/OffBit-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Haas Grotesk Display Pro';
+  src: url('${BASE_PATH}/fonts/NeueHaasDisplayRoman.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Haas Grotesk Display Pro';
+  src: url('${BASE_PATH}/fonts/NeueHaasDisplayMedium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Haas Grotesk Display Pro';
+  src: url('${BASE_PATH}/fonts/NeueHaasDisplayBold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+`;
+
 export const metadata: Metadata = {
   title: "Our Links - Open Session",
   description: "Design systems, AI advice, and insights from Fortune 500 veterans. Free resources, templates, and tools for designers and developers.",
@@ -50,6 +78,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <style dangerouslySetInnerHTML={{ __html: FONT_FACES }} />
         {/* Google Analytics */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}

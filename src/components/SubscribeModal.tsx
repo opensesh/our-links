@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, FormEvent, useCallback } from "react";
 import { X, Check, Copy } from "lucide-react";
 import { ShuffleText } from "./ShuffleText";
+import { assetPath } from "@/lib/assetPath";
 
 // localStorage key for resource access persistence
 const STORAGE_KEY = "os_resource_access";
@@ -188,7 +189,7 @@ export function SubscribeModal({
                 <div className="flex justify-center mb-4">
                   <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--bg-tertiary)] border border-[var(--border-secondary)]">
                     <video
-                      src="/our-links/videos/OS_Monogram_CRT_charcoal_1_compressed.mp4"
+                      src={assetPath("/videos/OS_Monogram_CRT_charcoal_1_compressed.mp4")}
                       autoPlay
                       loop
                       muted
