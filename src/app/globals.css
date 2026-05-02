@@ -202,12 +202,17 @@ button,
   }
 }
 
-/* CardNav social pills */
+/* CardNav social pills.
+   Mobile (<sm): icon-only circle so all six fit on one row on
+   iPhone-class widths. Tablet+ (sm+): icon + label pill. */
 .nav-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
+  justify-content: center;
+  gap: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
   border-radius: 9999px;
   background: var(--color-charcoal);
   color: var(--color-vanilla);
@@ -223,18 +228,41 @@ button,
   color: var(--color-vanilla);
 }
 
+.nav-pill-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .nav-pill {
+    width: auto;
+    height: auto;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+  }
+  .nav-pill-label {
+    display: inline;
+  }
+}
+
 .nav-pill-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1rem;
-  height: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
   flex-shrink: 0;
 }
 
+@media (min-width: 640px) {
+  .nav-pill-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
 .nav-pill-icon .link-icon-svg {
-  width: 1rem;
-  height: 1rem;
+  width: 100%;
+  height: 100%;
 }
 
 /* ============================================

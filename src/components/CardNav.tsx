@@ -547,12 +547,10 @@ export function CardNav() {
             </div>
 
             {/* Expanded body: cards + pills.
-                px-14 (56px) aligns the card edge with the inner edge of
-                the close (X) and globe buttons in the header — the
-                buttons are w-10 (40px) sitting inside the header's
-                px-4 (16px) gutter, so 16 + 40 = 56px. */}
+                Cards stay 2×2 up to lg (1024px) so tablet labels don't
+                get clipped; only at lg+ does the row become 1×4. */}
             <div ref={cardsRef} className="overflow-hidden">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-14 pb-3 sm:pb-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-6 pb-3 sm:pb-4">
                 {navCards.map((card) => (
                   <div key={card.id} className="gsap-stagger">
                     <NavCardItem card={card} hoverEnabled={videoEnabled} />
@@ -560,7 +558,7 @@ export function CardNav() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap justify-center gap-2 px-16 sm:px-20 pb-5 sm:pb-6">
+              <div className="flex flex-wrap justify-center gap-2 px-6 sm:px-10 pb-5 sm:pb-6">
                 {socialLinks.map((link) => (
                   <a
                     key={link.id}
@@ -568,9 +566,10 @@ export function CardNav() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="nav-pill gsap-stagger"
+                    aria-label={link.label}
                   >
                     <span className="nav-pill-icon">{link.icon}</span>
-                    <span>{link.label}</span>
+                    <span className="nav-pill-label">{link.label}</span>
                   </a>
                 ))}
               </div>
