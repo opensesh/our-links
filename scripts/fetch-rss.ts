@@ -185,31 +185,57 @@ function parseRssXml(xmlText: string): BlogPost[] {
   return items;
 }
 
-async function fetchOgImage(postUrl: string): Promise<string | null> {
+function decodeHtmlEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
+interface OgMeta {
+  image: string | null;
+  description: string | null;
+}
+
+// The Substack RSS feed caches its <description> field, so author edits don't
+// surface for hours. The live post page's og:/twitter: meta tags update much
+// faster, so we fetch them as the source of truth.
+async function fetchOgMeta(postUrl: string): Promise<OgMeta> {
   try {
     const response = await fetch(postUrl, {
       headers: FETCH_HEADERS,
       signal: AbortSignal.timeout(5000),
     });
-    if (!response.ok) return null;
+    if (!response.ok) return { image: null, description: null };
 
     const html = await response.text();
 
-    // Try og:image first (standard social preview)
-    const ogMatch =
+    const ogImageMatch =
       html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
       html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-
-    if (ogMatch?.[1]) return ogMatch[1];
-
-    // Fallback to twitter:image (sometimes more up-to-date)
-    const twitterMatch =
+    const twitterImageMatch =
       html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i) ||
       html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
 
-    return twitterMatch?.[1] || null;
+    const ogDescMatch =
+      html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i);
+    const twitterDescMatch =
+      html.match(/<meta[^>]+name=["']twitter:description["'][^>]+content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:description["']/i);
+
+    const rawDesc = ogDescMatch?.[1] || twitterDescMatch?.[1] || null;
+
+    return {
+      image: ogImageMatch?.[1] || twitterImageMatch?.[1] || null,
+      description: rawDesc ? decodeHtmlEntities(rawDesc).trim() : null,
+    };
   } catch {
-    return null;
+    return { image: null, description: null };
   }
 }
 
@@ -278,16 +304,18 @@ async function main() {
   const posts = parseRssXml(xmlText);
   console.log(`Parsed ${posts.length} blog posts`);
 
-  // Fetch og:image for ALL posts (social preview is preferred over content images)
-  // The og:image is the curated thumbnail the author sets, which is better than
-  // extracting random images from article content
+  // Pull the live post page's og:image and og:description. The author-curated
+  // og:image is preferred over content-extracted images, and og:description
+  // updates faster than the RSS <description> field (which is cached upstream).
   for (const post of posts) {
-    console.log(`Fetching og:image for: ${post.title.slice(0, 40)}...`);
-    const ogImage = await fetchOgImage(post.link);
-    if (ogImage) {
-      post.imageUrl = ogImage;
+    console.log(`Fetching og meta for: ${post.title.slice(0, 40)}...`);
+    const og = await fetchOgMeta(post.link);
+    if (og.image) {
+      post.imageUrl = og.image;
     }
-    // If og:image not found, keep the content-extracted image as fallback
+    if (og.description) {
+      post.description = og.description;
+    }
   }
 
   // Ensure output directory exists

@@ -1,6 +1,15 @@
 [
   {
-    "id": "blog-0-1774543190000",
+    "id": "blog-0-1777557751000",
+    "title": "KARIMO: Claude Code Harness",
+    "description": "Watch now (36sec) | The Claude Code harness we use every day at open session. PRD-driven, configurable, and open source. Walk away while features get built.",
+    "date": "Apr 30, 2026",
+    "author": "Open Session",
+    "imageUrl": "https://substackcdn.com/image/fetch/$s_!jiAg!,w_1200,h_600,c_fill,f_jpg,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack-video.s3.amazonaws.com%2Fvideo_upload%2Fpost%2F195954780%2Fbf221326-6e03-4aa0-bf25-7f43613824f7%2Ftranscoded-1777524134.png",
+    "link": "https://opensession.substack.com/p/karimo-claude-code-harness"
+  },
+  {
+    "id": "blog-1-1774543190000",
     "title": "The Brand Design System: A Free Atomic Figma Framework for Any Brand",
     "description": "Watch now (50 secs) |  A comprehensive Figma design system made for building and scaling brands in the AI era.",
     "date": "Mar 26, 2026",
@@ -9,7 +18,7 @@
     "link": "https://opensession.substack.com/p/the-brand-design-system-free-resource"
   },
   {
-    "id": "blog-1-1771006906000",
+    "id": "blog-2-1771006906000",
     "title": "Portfolio Template: A Free Presentation Deck for Designers & Creatives",
     "description": "Watch now (1.5 min) | This format helped designers get hired at Google and we're giving it away for free.",
     "date": "Feb 13, 2026",
@@ -18,7 +27,7 @@
     "link": "https://opensession.substack.com/p/portfolio-presentation-template-os"
   },
   {
-    "id": "blog-2-1770762000000",
+    "id": "blog-3-1770762000000",
     "title": "Design Directory: 150+ Design Resources | Free + Open Source",
     "description": "Watch now (3 mins) | 150+ design resources we actually use, visualized as a universe. Open source. Totally free",
     "date": "Feb 10, 2026",
@@ -27,7 +36,7 @@
     "link": "https://opensession.substack.com/p/designdirectory"
   },
   {
-    "id": "blog-3-1770159614000",
+    "id": "blog-4-1770159614000",
     "title": "EP02: Creative AI Framework: Making Sense of the Design Future",
     "description": "Breadth across design verticals now outperforms narrow specialization. Here's the framework every creative and business leader needs.",
     "date": "Feb 3, 2026",
@@ -36,9 +45,9 @@
     "link": "https://opensession.substack.com/p/ep02-creative-ai-framework-making"
   },
   {
-    "id": "blog-4-1768942135000",
+    "id": "blog-5-1768942135000",
     "title": "EP01: Creativity over Compute: The Case for Human-Centric Design",
-    "description": "Creativity over compute: why human imagination, agency, and embodied experience will always outlast AI hype&#8212;and become the most valuable differentiator.",
+    "description": "Creativity over compute: why human imagination, agency, and embodied experience will always outlast AI hype—and become the most valuable differentiator.",
     "date": "Jan 20, 2026",
     "author": "Open Session",
     "imageUrl": "https://substackcdn.com/image/fetch/$s_!autI!,w_1200,h_675,c_fill,f_jpg,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fca5dbdbd-bbd3-4bce-b285-df379de48c57_3854x2160.jpeg",
