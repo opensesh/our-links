@@ -22,7 +22,7 @@ export function Hero() {
           as="h1"
           delay={0.1}
           stagger={0.15}
-          className="font-display font-bold text-[var(--fg-primary)] leading-[1.1] tracking-tight text-4xl sm:text-5xl md:text-6xl mb-6 sm:mb-8"
+          className="font-display font-bold text-[var(--fg-primary)] leading-[1.1] tracking-tight text-3xl sm:text-4xl lg:text-5xl mb-6 sm:mb-8"
         >
           Brand. Code. Creative.
         </TextBlockReveal>
