@@ -138,14 +138,18 @@ button,
   aspect-ratio: 1 / 1;
   border-radius: 16px;
   overflow: hidden;
-  background: var(--color-charcoal);
+  /* Transparent so the card silhouette dissolves into the vanilla
+     container at rest. The video is masked at the edges (below) so
+     only the center of the frame is visible. */
+  background: transparent;
   cursor: pointer;
-  /* Inset box-shadow gives a stroke that follows the rounded corners
-     and animates smoothly (outline can't transition width). */
-  box-shadow: inset 0 0 0 0 transparent;
-  transition: box-shadow 0.2s ease;
-  /* Reset link/button defaults — kills the underline that was visible
-     on bottom-row cards and the iOS blue tap-highlight rectangle. */
+  /* Centered 2px stroke. `outline-offset: -1px` straddles the edge
+     (1px outside, 1px inside) and follows the border-radius. Color
+     starts transparent and fades in on hover/focus/primed. */
+  outline: 2px solid transparent;
+  outline-offset: -1px;
+  transition: outline-color 0.2s ease;
+  /* Reset link/button defaults — no underline, no iOS tap highlight. */
   text-decoration: none;
   color: inherit;
   border: 0;
@@ -156,9 +160,9 @@ button,
 }
 
 .nav-image-card:hover,
-.nav-image-card:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--color-aperol);
-  outline: none;
+.nav-image-card:focus-visible,
+.nav-image-card[data-primed="true"] {
+  outline-color: var(--color-aperol);
 }
 
 .nav-image-card[aria-disabled="true"] {
@@ -172,17 +176,33 @@ button,
   height: 100%;
   object-fit: cover;
   pointer-events: none;
+  /* Soft vignette mask: the video reads cleanly in the center and fades
+     to transparent at the edges, so the card has no visible silhouette
+     against the vanilla container at rest. */
+  mask-image: radial-gradient(
+    ellipse 95% 95% at 50% 45%,
+    #000 55%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 95% 95% at 50% 45%,
+    #000 55%,
+    transparent 100%
+  );
 }
 
 .nav-image-card-gradient {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* Bottom slab of vanilla so the label sits on a clean readable
+     background. Above that, transitions to transparent so the masked
+     video can show through. */
   background: linear-gradient(
     to top,
     var(--color-vanilla) 0%,
     var(--color-vanilla) 22%,
-    rgba(255, 250, 238, 0) 60%
+    rgba(255, 250, 238, 0) 55%
   );
 }
 

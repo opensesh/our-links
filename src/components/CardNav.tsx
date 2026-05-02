@@ -192,19 +192,18 @@ const REWIND_MS = 500;
 interface NavCardItemProps {
   card: NavCard;
   hoverEnabled: boolean;
-  navOpen: boolean;
+  isPrimed: boolean;
+  onPrime: (id: string) => void;
 }
 
-function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
+function NavCardItem({ card, hoverEnabled, isPrimed, onPrime }: NavCardItemProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hoveringRef = useRef(false);
+  // True whenever this card's video should be playing: hovered (desktop)
+  // OR primed (touch). Read by the loop driver to decide whether to rewind.
+  const activeRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
-  // Touch UX: first tap "primes" the card (plays the video), second tap
-  // follows the link. Desktop ignores this and uses hover. A ref is enough
-  // here — `hasPrimed` is only read in event handlers, not during render.
-  const hasPrimedRef = useRef(false);
 
-  const startPlay = () => {
+  const playFromStart = () => {
     const video = videoRef.current;
     if (!video) return;
     try {
@@ -215,19 +214,32 @@ function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
     void video.play().catch(() => {});
   };
 
+  const stopAndReset = () => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    const video = videoRef.current;
+    if (!video) return;
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
+  };
+
   // Loop driver: on video end, tween currentTime back to 0 then replay.
-  // Inlined inside the effect so React's exhaustive-deps lint stays happy
-  // (everything it touches is a ref, so no dep array entries are needed).
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const onEnded = () => {
-      if (!hoveringRef.current || !Number.isFinite(video.duration)) return;
+      if (!activeRef.current || !Number.isFinite(video.duration)) return;
       const from = video.duration;
       const startTs = performance.now();
       const tick = (now: number) => {
-        if (!hoveringRef.current) return;
+        if (!activeRef.current) return;
         const t = Math.min(1, (now - startTs) / REWIND_MS);
         video.currentTime = from * (1 - t);
         if (t < 1) {
@@ -251,60 +263,35 @@ function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
     };
   }, []);
 
-  // Reset prime + pause whenever the nav closes so the next open shows
-  // the first-frame poster again and the tap-to-preview UX is restored.
+  // Touch: drive play/pause off the parent-owned `isPrimed` so only one
+  // card is active at a time (iOS chokes on multiple simultaneous videos).
   useEffect(() => {
-    if (navOpen) return;
-    hasPrimedRef.current = false;
-    hoveringRef.current = false;
-    if (rafIdRef.current !== null) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
-    const video = videoRef.current;
-    if (!video) return;
-    video.pause();
-    try {
-      video.currentTime = 0;
-    } catch {
-      /* ignore */
-    }
-  }, [navOpen]);
+    if (hoverEnabled) return;
+    activeRef.current = isPrimed;
+    if (isPrimed) playFromStart();
+    else stopAndReset();
+  }, [isPrimed, hoverEnabled]);
 
   const handleEnter = () => {
     if (!hoverEnabled) return;
-    hoveringRef.current = true;
-    startPlay();
+    activeRef.current = true;
+    playFromStart();
   };
 
   const handleLeave = () => {
     if (!hoverEnabled) return;
-    hoveringRef.current = false;
-    if (rafIdRef.current !== null) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
-    const video = videoRef.current;
-    if (!video) return;
-    video.pause();
-    try {
-      video.currentTime = 0;
-    } catch {
-      /* ignore */
-    }
+    activeRef.current = false;
+    stopAndReset();
   };
 
-  // Touch tap handler: first tap plays the video and swallows the click
-  // so the user can preview before navigating; second tap (now primed)
-  // falls through to the link/button default action.
+  // Touch tap: first tap primes the card (plays the video and swallows
+  // the click); second tap (already primed) falls through to navigation.
   const handleTouchClick = (e: MouseEvent) => {
     if (hoverEnabled) return;
-    if (!hasPrimedRef.current) {
+    if (!isPrimed) {
       e.preventDefault();
       e.stopPropagation();
-      hasPrimedRef.current = true;
-      hoveringRef.current = true;
-      startPlay();
+      onPrime(card.id);
     }
   };
 
@@ -312,8 +299,7 @@ function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
 
   // The `#t=0.001` fragment forces iOS Safari to seek-and-render the
   // first frame at load time, so the card shows a real preview instead
-  // of black before the user hovers/taps. Without this the metadata
-  // loads but no frame is displayed on Safari iOS.
+  // of black before the user hovers/taps.
   const videoSrc = `${assetPath(card.videoSrc)}#t=0.001`;
 
   const inner = (
@@ -323,7 +309,7 @@ function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
         src={videoSrc}
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
         aria-hidden="true"
       />
@@ -334,11 +320,14 @@ function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
     </>
   );
 
+  const dataPrimed = isPrimed ? "true" : undefined;
+
   if (card.disabled) {
     return (
       <button
         type="button"
         className={sharedClassName}
+        data-primed={dataPrimed}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onFocus={handleEnter}
@@ -358,6 +347,7 @@ function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
       target="_blank"
       rel="noopener noreferrer"
       className={sharedClassName}
+      data-primed={dataPrimed}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onFocus={handleEnter}
@@ -373,10 +363,24 @@ function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
 
 export function CardNav() {
   const [isOpen, setIsOpen] = useState(false);
+  // Touch UX: only one card may be "primed" (preview-playing) at a time.
+  // Lifting state up here keeps iOS from juggling four concurrent <video>
+  // elements, which manifested as glitchy/laggy playback.
+  const [primedCardId, setPrimedCardId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+
+  const closeNav = () => {
+    setPrimedCardId(null);
+    setIsOpen(false);
+  };
+
+  const toggleNav = () => {
+    if (isOpen) setPrimedCardId(null);
+    setIsOpen((v) => !v);
+  };
 
   // Hover-only on devices with a fine pointer (desktop). Touch devices skip
   // video playback entirely — taps navigate immediately.
@@ -529,7 +533,7 @@ export function CardNav() {
           visibility: "hidden",
           pointerEvents: "none",
         }}
-        onClick={() => setIsOpen(false)}
+        onClick={closeNav}
       />
 
       <nav className="w-full relative z-50">
@@ -546,7 +550,7 @@ export function CardNav() {
             <div className="relative flex items-center justify-between h-[60px] px-4">
               <button
                 ref={hamburgerRef}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleNav}
                 className="relative w-10 h-10 flex flex-col items-center justify-center gap-1.5 flex-shrink-0"
                 aria-label={isOpen ? "Close menu" : "Open menu"}
                 aria-expanded={isOpen}
@@ -607,7 +611,8 @@ export function CardNav() {
                     <NavCardItem
                       card={card}
                       hoverEnabled={videoEnabled}
-                      navOpen={isOpen}
+                      isPrimed={primedCardId === card.id}
+                      onPrime={setPrimedCardId}
                     />
                   </div>
                 ))}
