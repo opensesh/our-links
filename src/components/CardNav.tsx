@@ -435,7 +435,13 @@ export function CardNav() {
     }
   }, [isOpen]);
 
-  // Backdrop blur fade
+  // Backdrop blur fade.
+  // Timed so the backdrop only darkens AFTER the container is mostly
+  // expanded (and conversely, fades out BEFORE the container shrinks).
+  // Otherwise the vanilla container's bottom edge sweeping against a
+  // darkening backdrop reads as a horizontal stroke during the height
+  // tween — the silhouette change is invisible against the page bg
+  // when the backdrop hasn't faded in yet.
   useEffect(() => {
     if (!overlayRef.current) return;
 
@@ -444,13 +450,14 @@ export function CardNav() {
         opacity: 1,
         visibility: "visible",
         pointerEvents: "auto",
-        duration: 0.3,
+        duration: 0.25,
+        delay: 0.3,
         ease: "power2.out",
       });
     } else {
       gsap.to(overlayRef.current, {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.2,
         ease: "power2.out",
         onComplete: () => {
           if (overlayRef.current) {
