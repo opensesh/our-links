@@ -2,18 +2,343 @@
 
 import { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
+import { assetPath } from "@/lib/assetPath";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
+// ---------- Social pill icons (lifted from the now-removed OurLinks.tsx) ----------
+
+function FigmaIcon() {
+  return (
+    <svg
+      className="link-icon-svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z" />
+      <path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z" />
+      <path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z" />
+      <path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z" />
+      <path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z" />
+    </svg>
+  );
+}
+
+function GitHubIcon() {
+  return (
+    <svg
+      className="link-icon-svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+    </svg>
+  );
+}
+
+function SubstackIcon() {
+  return (
+    <svg
+      className="link-icon-svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 6h16" />
+      <path d="M4 10h16" />
+      <path d="M4 14v8l8-4 8 4v-8" />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg
+      className="link-icon-svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg
+      className="link-icon-svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect x="2" y="9" width="4" height="12" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+function MediumIcon() {
+  return (
+    <svg
+      className="link-icon-svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <ellipse cx="6.5" cy="12" rx="4.5" ry="6" />
+      <ellipse cx="17" cy="12" rx="2" ry="6" />
+      <line x1="22" y1="6" x2="22" y2="18" />
+    </svg>
+  );
+}
+
+// ---------- Card data ----------
 
 interface NavCard {
   id: string;
   label: string;
-  href: string;
+  href: string; // empty when disabled
+  videoSrc: string; // public/videos/... — passed through assetPath()
+  disabled?: boolean;
 }
 
 const navCards: NavCard[] = [
-  { id: "about", label: "About", href: "https://opensession.co/about" },
-  { id: "projects", label: "Projects", href: "https://opensession.co/projects" },
-  { id: "contact", label: "Contact", href: "https://opensession.co/contact" },
+  {
+    id: "projects",
+    label: "Projects",
+    href: "https://opensession.co/projects",
+    videoSrc: "/videos/card-projects.mp4",
+  },
+  {
+    id: "about",
+    label: "About",
+    href: "https://opensession.co/about",
+    videoSrc: "/videos/card-about.mp4",
+  },
+  {
+    id: "product",
+    label: "Product*",
+    href: "",
+    videoSrc: "/videos/card-product.mp4",
+    disabled: true,
+  },
+  {
+    id: "contact",
+    label: "Contact",
+    href: "https://opensession.co/contact",
+    videoSrc: "/videos/card-contact.mp4",
+  },
 ];
+
+interface SocialLink {
+  id: string;
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+const socialLinks: SocialLink[] = [
+  {
+    id: "github",
+    label: "Github",
+    href: "https://link.opensession.co/website-github",
+    icon: <GitHubIcon />,
+  },
+  {
+    id: "figma",
+    label: "Figma",
+    href: "https://link.opensession.co/website-figma",
+    icon: <FigmaIcon />,
+  },
+  {
+    id: "instagram",
+    label: "Instagram",
+    href: "https://link.opensession.co/website-instagram",
+    icon: <InstagramIcon />,
+  },
+  {
+    id: "linkedin",
+    label: "Linkedin",
+    href: "https://www.linkedin.com/company/opensession/",
+    icon: <LinkedInIcon />,
+  },
+  {
+    id: "substack",
+    label: "Substack",
+    href: "https://link.opensession.co/website-substack",
+    icon: <SubstackIcon />,
+  },
+  {
+    id: "medium",
+    label: "Medium",
+    href: "https://link.opensession.co/website-medium",
+    icon: <MediumIcon />,
+  },
+];
+
+// ---------- NavCardItem (image card with hover-play + rewind loop) ----------
+
+const REWIND_MS = 500;
+
+interface NavCardItemProps {
+  card: NavCard;
+  hoverEnabled: boolean;
+}
+
+function NavCardItem({ card, hoverEnabled }: NavCardItemProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hoveringRef = useRef(false);
+  const rafIdRef = useRef<number | null>(null);
+
+  const startPlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    try {
+      video.currentTime = 0;
+    } catch {
+      /* duration may not be ready yet */
+    }
+    void video.play().catch(() => {});
+  };
+
+  // Loop driver: on video end, tween currentTime back to 0 then replay.
+  // Inlined inside the effect so React's exhaustive-deps lint stays happy
+  // (everything it touches is a ref, so no dep array entries are needed).
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onEnded = () => {
+      if (!hoveringRef.current || !Number.isFinite(video.duration)) return;
+      const from = video.duration;
+      const startTs = performance.now();
+      const tick = (now: number) => {
+        if (!hoveringRef.current) return;
+        const t = Math.min(1, (now - startTs) / REWIND_MS);
+        video.currentTime = from * (1 - t);
+        if (t < 1) {
+          rafIdRef.current = requestAnimationFrame(tick);
+        } else {
+          try {
+            video.currentTime = 0;
+          } catch {
+            /* ignore */
+          }
+          void video.play().catch(() => {});
+        }
+      };
+      rafIdRef.current = requestAnimationFrame(tick);
+    };
+
+    video.addEventListener("ended", onEnded);
+    return () => {
+      video.removeEventListener("ended", onEnded);
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
+    };
+  }, []);
+
+  const handleEnter = () => {
+    if (!hoverEnabled) return;
+    hoveringRef.current = true;
+    startPlay();
+  };
+
+  const handleLeave = () => {
+    hoveringRef.current = false;
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    const video = videoRef.current;
+    if (!video) return;
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const sharedClassName = "nav-image-card group block";
+  const sharedStyle = card.disabled ? undefined : undefined;
+
+  const inner = (
+    <>
+      <video
+        ref={videoRef}
+        src={assetPath(card.videoSrc)}
+        muted
+        playsInline
+        preload="metadata"
+        disablePictureInPicture
+        aria-hidden="true"
+      />
+      <span className="nav-image-card-gradient" aria-hidden="true" />
+      <span className="nav-image-card-label font-display text-2xl sm:text-[28px] md:text-3xl">
+        {card.label}
+      </span>
+    </>
+  );
+
+  if (card.disabled) {
+    return (
+      <button
+        type="button"
+        className={sharedClassName}
+        style={sharedStyle}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        onFocus={handleEnter}
+        onBlur={handleLeave}
+        aria-label={`${card.label} (coming soon)`}
+        aria-disabled="true"
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <a
+      href={card.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={sharedClassName}
+      style={sharedStyle}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onFocus={handleEnter}
+      onBlur={handleLeave}
+    >
+      {inner}
+    </a>
+  );
+}
+
+// ---------- CardNav ----------
 
 export function CardNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,44 +347,44 @@ export function CardNav() {
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
+  // Hover-only on devices with a fine pointer (desktop). Touch devices skip
+  // video playback entirely — taps navigate immediately.
+  const hoverCapable = useMediaQuery("(hover: hover) and (pointer: fine)");
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const videoEnabled = hoverCapable && !reducedMotion;
+
+  // Open / close timeline
   useEffect(() => {
     if (!containerRef.current || !cardsRef.current) return;
 
     const tl = gsap.timeline();
+    const staggerTargets = cardsRef.current.querySelectorAll<HTMLElement>(
+      ".gsap-stagger"
+    );
 
     if (isOpen) {
-      // Desktop uses fixed height to align with OurLinks, mobile/tablet uses auto
-      const isDesktop = window.innerWidth >= 1024;
-      const targetHeight = isDesktop ? 235 : "auto";
-
-      // Expand animation
       tl.to(containerRef.current, {
-        height: targetHeight,
+        height: "auto",
         duration: 0.4,
         ease: "power2.out",
-      })
-        .fromTo(
-          cardsRef.current.children,
-          {
-            opacity: 0,
-            y: 20,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.3,
-            stagger: 0.08,
-            ease: "power2.out",
-          },
-          "-=0.2"
-        );
+      }).fromTo(
+        staggerTargets,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.3,
+          stagger: 0.06,
+          ease: "power2.out",
+        },
+        "-=0.2"
+      );
     } else {
-      // Collapse animation
-      tl.to(cardsRef.current.children, {
+      tl.to(staggerTargets, {
         opacity: 0,
         y: 10,
         duration: 0.2,
-        stagger: 0.03,
+        stagger: 0.02,
         ease: "power2.in",
       }).to(containerRef.current, {
         height: 60,
@@ -73,7 +398,7 @@ export function CardNav() {
     };
   }, [isOpen]);
 
-  // Hamburger to X animation
+  // Hamburger ↔ X
   useEffect(() => {
     if (!hamburgerRef.current) return;
     const lines = hamburgerRef.current.querySelectorAll("span");
@@ -124,12 +449,11 @@ export function CardNav() {
     }
   }, [isOpen]);
 
-  // Background blur overlay animation
+  // Backdrop blur fade
   useEffect(() => {
     if (!overlayRef.current) return;
 
     if (isOpen) {
-      // Fade in overlay
       gsap.to(overlayRef.current, {
         opacity: 1,
         visibility: "visible",
@@ -138,7 +462,6 @@ export function CardNav() {
         ease: "power2.out",
       });
     } else {
-      // Fade out overlay - slower than card collapse for smooth feel
       gsap.to(overlayRef.current, {
         opacity: 0,
         duration: 0.5,
@@ -157,7 +480,6 @@ export function CardNav() {
 
   return (
     <>
-      {/* Background blur overlay */}
       <div
         ref={overlayRef}
         className="fixed inset-0 z-40"
@@ -183,14 +505,14 @@ export function CardNav() {
               height: 60,
             }}
           >
-            {/* Header Row */}
+            {/* Header row */}
             <div className="relative flex items-center justify-between h-[60px] px-4">
-              {/* Hamburger / X Button */}
               <button
                 ref={hamburgerRef}
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative w-10 h-10 flex flex-col items-center justify-center gap-1.5 flex-shrink-0"
                 aria-label={isOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isOpen}
               >
                 <span
                   className="block w-5 h-0.5 origin-center"
@@ -206,16 +528,14 @@ export function CardNav() {
                 />
               </button>
 
-              {/* Centered Horizontal Wordmark */}
               <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
                 <img
-                  src="/our-links/images/logo_wordmark_charcoal.svg"
+                  src={assetPath("/images/logo_wordmark_charcoal.svg")}
                   alt="Open Session"
                   className="h-[32px] sm:h-[36px] w-auto"
                 />
               </div>
 
-              {/* Globe Icon Button */}
               <a
                 href="https://opensession.co/"
                 target="_blank"
@@ -240,45 +560,30 @@ export function CardNav() {
               </a>
             </div>
 
-            {/* Cards Container */}
-            <div
-              ref={cardsRef}
-              className="px-4 pb-4 grid gap-3 md:grid-cols-3 grid-cols-1 overflow-hidden"
-                          >
-              {navCards.map((card) => (
-                <a
-                  key={card.id}
-                  href={card.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="nav-card group relative flex flex-col justify-between p-5 rounded-xl text-left font-accent text-2xl font-bold min-h-[148px]"
-                  style={{
-                    background: "var(--color-charcoal)",
-                  }}
-                >
-                  {/* External link arrow - top right */}
-                  <div className="flex justify-end">
-                    <svg
-                      className="nav-card-arrow w-5 h-5 transition-colors duration-150"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.833 14.167L14.166 5.833M14.166 5.833H5.833M14.166 5.833V14.167"
-                        stroke="currentColor"
-                        strokeWidth="1.67"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+            {/* Expanded body: cards + pills */}
+            <div ref={cardsRef} className="overflow-hidden">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-4 pb-3">
+                {navCards.map((card) => (
+                  <div key={card.id} className="gsap-stagger">
+                    <NavCardItem card={card} hoverEnabled={videoEnabled} />
                   </div>
-                  {/* Label - bottom left */}
-                  <span className="nav-card-text transition-colors duration-150">
-                    {card.label}
-                  </span>
-                </a>
-              ))}
+                ))}
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-2 px-6 sm:px-8 pb-4">
+                {socialLinks.map((link) => (
+                  <a
+                    key={link.id}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="nav-pill gsap-stagger"
+                  >
+                    <span className="nav-pill-icon">{link.icon}</span>
+                    <span>{link.label}</span>
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>

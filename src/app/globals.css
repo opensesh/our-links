@@ -127,38 +127,107 @@ button,
   overflow: clip;
 }
 
-/* CardNav card hover effect */
-.nav-card {
-  border: 1px solid var(--border-secondary);
-  transition: border-color 0.15s ease;
+/* ============================================
+   CARDNAV - Expanded image cards with hover-play video
+   ============================================ */
+
+.nav-image-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-charcoal);
+  cursor: pointer;
+  outline: 0 solid transparent;
+  outline-offset: -2px;
+  transition: outline-color 0.2s ease, transform 0.2s ease;
 }
 
-.nav-card:hover {
-  border-color: var(--border-brand);
+.nav-image-card:hover,
+.nav-image-card:focus-visible {
+  outline: 2px solid var(--color-aperol);
 }
 
-/* Card text and arrow - default vanilla color */
-.nav-card-text,
-.nav-card-arrow {
+.nav-image-card[aria-disabled="true"] {
+  cursor: default;
+}
+
+.nav-image-card[aria-disabled="true"] .nav-image-card-label {
+  color: var(--color-aperol);
+}
+
+.nav-image-card video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.nav-image-card-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    var(--color-vanilla) 0%,
+    var(--color-vanilla) 22%,
+    rgba(255, 250, 238, 0) 60%
+  );
+}
+
+.nav-image-card-label {
+  position: absolute;
+  left: 0.875rem;
+  bottom: 0.625rem;
+  color: var(--color-charcoal);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-image-card {
+    transition: none;
+  }
+}
+
+/* CardNav social pills */
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 9999px;
+  background: var(--color-charcoal);
+  color: var(--color-vanilla);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-pill:hover,
+.nav-pill:focus-visible {
+  background: var(--bg-brand-solid);
   color: var(--color-vanilla);
 }
 
-/* Card text and arrow - Brand color on hover */
-.nav-card:hover .nav-card-text,
-.nav-card:hover .nav-card-arrow {
-  color: var(--fg-brand-primary);
+.nav-pill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }
 
-/* Link icon hover effect */
-.link-icon {
-  border-color: var(--color-vanilla);
-  color: var(--color-vanilla);
-  transition: border-color 0.15s ease, color 0.15s ease;
-}
-
-.link-icon:hover {
-  border-color: var(--border-brand);
-  color: var(--fg-brand-primary);
+.nav-pill-icon .link-icon-svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 /* ============================================
@@ -386,143 +455,6 @@ button,
   background: var(--color-vanilla);
   color: #191919;
 }
-
-/* ============================================
-   OUR LINKS - Swipeable Cards Carousel
-   ============================================ */
-
-/* Scroll wrapper - provides edge-to-edge scrolling */
-.links-scroll-wrapper {
-  width: 100%;
-  overflow: visible;
-}
-
-/* Scroll container */
-.links-scroll {
-  display: flex;
-  gap: 17px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-/* Tablet - symmetric padding aligned with content max-width */
-@media (min-width: 640px) {
-  .links-scroll {
-    padding-left: max(16px, calc((100vw - var(--content-max-width)) / 2));
-    padding-right: max(16px, calc((100vw - var(--content-max-width)) / 2));
-  }
-}
-
-/* Desktop - full alignment with content max-width */
-@media (min-width: 1024px) {
-  .links-scroll {
-    padding-left: max(16px, calc((100vw - var(--content-max-width)) / 2));
-    padding-right: max(16px, calc((100vw - var(--content-max-width)) / 2));
-  }
-}
-
-.links-scroll::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-/* Link card - peek effect with partial card visible */
-.link-card {
-  scroll-snap-align: start;
-  /* Show ~3.5 cards with partial 4th for peek effect */
-  width: calc((var(--content-max-width) - 2rem - 51px) / 3.5);
-  min-width: 80px;
-  max-width: 100px;
-}
-
-/* Tablet - more cards visible */
-@media (min-width: 640px) {
-  .link-card {
-    width: calc((var(--content-max-width) - 2rem - 68px) / 4.5);
-    max-width: 95px;
-  }
-}
-
-/* Desktop - even more cards */
-@media (min-width: 1024px) {
-  .link-card {
-    width: calc((var(--content-max-width) - 2rem - 85px) / 5.5);
-    max-width: 110px;
-  }
-}
-
-/* Link card hover effect */
-.link-card {
-  transition: border-color 0.15s ease;
-}
-
-.link-card:hover {
-  border-color: var(--border-brand) !important;
-}
-
-.link-card .link-card-icon {
-  transition: border-color 0.15s ease, color 0.15s ease;
-}
-
-/* Desktop reordering for Our Links grid */
-@media (min-width: 640px) {
-  .our-links-grid .link-card {
-    order: var(--desktop-order, 0);
-  }
-}
-
-/* Our Links Carousel Mode */
-.our-links-carousel {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding: 4px 56px;
-  scroll-padding-left: 56px; /* Offset snap points for left arrow overlay */
-  scroll-padding-right: 56px; /* Offset snap points for right arrow overlay */
-}
-
-.our-links-carousel::-webkit-scrollbar {
-  display: none;
-}
-
-/* Carousel cards - fixed width with aspect-square */
-.our-links-carousel .carousel-card {
-  scroll-snap-align: start;
-  flex-shrink: 0;
-  width: 100px;
-  min-width: 100px;
-}
-
-/* Arrow buttons - now positioned within gradient overlays */
-.our-links-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(25, 25, 25, 0.9);
-  border: 1px solid var(--color-vanilla);
-  color: var(--color-vanilla);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.our-links-arrow:hover {
-  background: rgba(25, 25, 25, 1);
-  border-color: var(--border-brand);
-  color: var(--border-brand);
-}
-
 
 /* ============================================
    RECENT BLOGS - Vertical Stacked Cards
