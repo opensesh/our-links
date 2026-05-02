@@ -44,7 +44,7 @@ export function Hero() {
           className="flex items-center gap-4 flex-wrap"
         >
           <ActionButton href="https://opensession.co/contact" external size="lg">
-            Start a Project
+            Contact Us
           </ActionButton>
           <UnderlineLink
             href="https://opensession.co/projects"
