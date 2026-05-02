@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, MouseEvent } from "react";
 import { gsap } from "gsap";
 import { assetPath } from "@/lib/assetPath";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -192,12 +192,17 @@ const REWIND_MS = 500;
 interface NavCardItemProps {
   card: NavCard;
   hoverEnabled: boolean;
+  navOpen: boolean;
 }
 
-function NavCardItem({ card, hoverEnabled }: NavCardItemProps) {
+function NavCardItem({ card, hoverEnabled, navOpen }: NavCardItemProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hoveringRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
+  // Touch UX: first tap "primes" the card (plays the video), second tap
+  // follows the link. Desktop ignores this and uses hover. A ref is enough
+  // here — `hasPrimed` is only read in event handlers, not during render.
+  const hasPrimedRef = useRef(false);
 
   const startPlay = () => {
     const video = videoRef.current;
@@ -246,6 +251,26 @@ function NavCardItem({ card, hoverEnabled }: NavCardItemProps) {
     };
   }, []);
 
+  // Reset prime + pause whenever the nav closes so the next open shows
+  // the first-frame poster again and the tap-to-preview UX is restored.
+  useEffect(() => {
+    if (navOpen) return;
+    hasPrimedRef.current = false;
+    hoveringRef.current = false;
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    const video = videoRef.current;
+    if (!video) return;
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
+  }, [navOpen]);
+
   const handleEnter = () => {
     if (!hoverEnabled) return;
     hoveringRef.current = true;
@@ -253,6 +278,7 @@ function NavCardItem({ card, hoverEnabled }: NavCardItemProps) {
   };
 
   const handleLeave = () => {
+    if (!hoverEnabled) return;
     hoveringRef.current = false;
     if (rafIdRef.current !== null) {
       cancelAnimationFrame(rafIdRef.current);
@@ -268,17 +294,36 @@ function NavCardItem({ card, hoverEnabled }: NavCardItemProps) {
     }
   };
 
+  // Touch tap handler: first tap plays the video and swallows the click
+  // so the user can preview before navigating; second tap (now primed)
+  // falls through to the link/button default action.
+  const handleTouchClick = (e: MouseEvent) => {
+    if (hoverEnabled) return;
+    if (!hasPrimedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      hasPrimedRef.current = true;
+      hoveringRef.current = true;
+      startPlay();
+    }
+  };
+
   const sharedClassName = "nav-image-card group block";
-  const sharedStyle = card.disabled ? undefined : undefined;
+
+  // The `#t=0.001` fragment forces iOS Safari to seek-and-render the
+  // first frame at load time, so the card shows a real preview instead
+  // of black before the user hovers/taps. Without this the metadata
+  // loads but no frame is displayed on Safari iOS.
+  const videoSrc = `${assetPath(card.videoSrc)}#t=0.001`;
 
   const inner = (
     <>
       <video
         ref={videoRef}
-        src={assetPath(card.videoSrc)}
+        src={videoSrc}
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
         disablePictureInPicture
         aria-hidden="true"
       />
@@ -294,11 +339,11 @@ function NavCardItem({ card, hoverEnabled }: NavCardItemProps) {
       <button
         type="button"
         className={sharedClassName}
-        style={sharedStyle}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onFocus={handleEnter}
         onBlur={handleLeave}
+        onClick={handleTouchClick}
         aria-label={`${card.label} (coming soon)`}
         aria-disabled="true"
       >
@@ -313,11 +358,11 @@ function NavCardItem({ card, hoverEnabled }: NavCardItemProps) {
       target="_blank"
       rel="noopener noreferrer"
       className={sharedClassName}
-      style={sharedStyle}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onFocus={handleEnter}
       onBlur={handleLeave}
+      onClick={handleTouchClick}
     >
       {inner}
     </a>
@@ -559,7 +604,11 @@ export function CardNav() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-6 pb-3 sm:pb-4">
                 {navCards.map((card) => (
                   <div key={card.id} className="gsap-stagger">
-                    <NavCardItem card={card} hoverEnabled={videoEnabled} />
+                    <NavCardItem
+                      card={card}
+                      hoverEnabled={videoEnabled}
+                      navOpen={isOpen}
+                    />
                   </div>
                 ))}
               </div>
