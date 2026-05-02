@@ -408,12 +408,12 @@ export function TechStack() {
   }, [selectedIndex, findCenteredItemIndex]);
 
   return (
-    <section className="w-full mt-8 sm:mt-10 mb-8">
+    <section className="w-full mt-16 sm:mt-20 mb-8">
       {/* Heading - aligned with max-w content */}
       <div className="px-4 mb-4">
         <div className="max-w-[var(--content-max-width)] mx-auto">
           <h2
-            className="text-xl font-bold"
+            className="text-[1.375rem] font-bold"
             style={{ color: "var(--color-vanilla)" }}
           >
             Our Tools

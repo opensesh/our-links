@@ -214,12 +214,12 @@ export function RecentBlogs() {
   const handleNext = () => setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
 
   return (
-    <section className="w-full mt-6 sm:mt-8">
+    <section className="w-full mt-12 sm:mt-16">
       <div className="max-w-[var(--content-max-width)] mx-auto">
         {/* Heading row: title + sort */}
         <div className="resource-header">
           <h2
-            className="font-sans text-xl font-bold"
+            className="font-sans text-[1.375rem] font-bold"
             style={{ color: "var(--color-vanilla)", fontFamily: "var(--font-sans)" }}
           >
             Recent Blogs
