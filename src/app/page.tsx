@@ -1,6 +1,6 @@
 import { CardNav } from "@/components/CardNav";
 import { Footer } from "@/components/Footer";
-import { OurLinks } from "@/components/OurLinks";
+import { Hero } from "@/components/Hero";
 import { FreeResources } from "@/components/FreeResources";
 import { RecentBlogs } from "@/components/RecentBlogs";
 import { TechStack } from "@/components/TechStack";
@@ -21,7 +21,7 @@ export default function Home() {
         {/* SCROLLER - handles scrolling, scrollbar at viewport edge */}
         <div className="h-full overflow-y-auto overflow-x-hidden px-[clamp(1rem,4vw,3rem)]">
           <main className="flex flex-col items-center pt-4 pb-6 gap-4 sm:gap-6 px-4 max-w-[var(--content-max-width)] mx-auto">
-            <OurLinks />
+            <Hero />
             <FreeResources />
             <RecentBlogs />
             <TechStack />

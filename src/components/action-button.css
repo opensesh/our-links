@@ -1,0 +1,37 @@
+/* =============================================================================
+   ActionButton — brand-variant glisten sweep
+   ============================================================================= */
+
+.action-button {
+  --ease-power4-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.action-button-glisten {
+  background: linear-gradient(
+    90deg,
+    var(--color-charcoal) 0%,
+    var(--color-charcoal) 40%,
+    var(--color-vanilla) 48%,
+    var(--color-vanilla) 52%,
+    var(--color-charcoal) 60%,
+    var(--color-charcoal) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.group:hover .action-button-glisten {
+  animation: action-button-text-glisten 800ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes action-button-text-glisten {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
