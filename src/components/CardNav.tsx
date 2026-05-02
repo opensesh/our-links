@@ -487,7 +487,6 @@ export function CardNav() {
             className="overflow-hidden rounded-2xl shadow-md"
             style={{
               background: "var(--color-vanilla)",
-              border: "1px solid var(--border-secondary)",
               height: 60,
             }}
           >
