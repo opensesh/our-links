@@ -15,6 +15,31 @@ interface BlogPost {
 
 const PAGE_SIZE = 3;
 
+/* Posts are fetched once per page load and shared across bin open/close
+   cycles, so reopening the bin never flashes skeletons or resizes the
+   panel while its height animation is still running. */
+let postsCache: BlogPost[] | null = null;
+let postsPromise: Promise<BlogPost[]> | null = null;
+
+export function prefetchBlogPosts(): Promise<BlogPost[]> {
+  if (postsCache) return Promise.resolve(postsCache);
+  if (postsPromise) return postsPromise;
+  postsPromise = (async () => {
+    const basePath = window.location.pathname.replace(/\/$/, "") || "";
+    const response = await fetch(`${basePath}/data/blogs.json`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch blogs: ${response.status}`);
+    }
+    const data: BlogPost[] = await response.json();
+    postsCache = data;
+    return data;
+  })().catch((err) => {
+    postsPromise = null; // allow a retry on the next call
+    throw err;
+  });
+  return postsPromise;
+}
+
 function ChevronLeftIcon() {
   return (
     <svg
@@ -118,29 +143,27 @@ function BlogCardSkeleton() {
 
 /** Body of the "Our Blogs" bin: newest posts, paged, plus the Substack form. */
 export function BlogsPanel() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [posts, setPosts] = useState<BlogPost[]>(() => postsCache ?? []);
+  const [isLoading, setIsLoading] = useState(() => postsCache === null);
   const [error, setError] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
-    async function loadPosts() {
-      try {
-        const basePath = window.location.pathname.replace(/\/$/, "") || "";
-        const blogsUrl = `${basePath}/data/blogs.json`;
-        const response = await fetch(blogsUrl);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch blogs: ${response.status}`);
-        }
-        const data: BlogPost[] = await response.json();
-        setPosts(data);
-      } catch {
-        setError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadPosts();
+    if (postsCache) return;
+    let cancelled = false;
+    prefetchBlogPosts()
+      .then((data) => {
+        if (!cancelled) setPosts(data);
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const pages = useMemo(() => {

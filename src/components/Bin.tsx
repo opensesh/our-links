@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 
@@ -33,6 +33,7 @@ export function Bin({
   const [settled, setSettled] = useState(defaultOpen);
   const reduceMotion = useReducedMotion();
   const panelId = useId();
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <motion.div
@@ -81,8 +82,16 @@ export function Bin({
               height: { type: "spring", duration: 0.55, bounce: 0.12 },
               opacity: { duration: 0.22, ease: "easeOut" },
             }}
+            ref={panelRef}
             style={{ overflow: settled ? "visible" : "hidden" }}
-            onAnimationComplete={() => setSettled(true)}
+            onAnimationComplete={() => {
+              // Content can grow after the open animation measured it
+              // (e.g. paginated lists), so hand the height back to layout.
+              if (open && panelRef.current) {
+                panelRef.current.style.height = "auto";
+              }
+              setSettled(true);
+            }}
           >
             {bare ? (
               <div className="bin-panel-bare">{children}</div>

@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { Bin } from "./Bin";
 import { FreeResourcesPanel } from "./FreeResources";
-import { BlogsPanel } from "./RecentBlogs";
+import { BlogsPanel, prefetchBlogPosts } from "./RecentBlogs";
 import { SocialLinksPanel } from "./SocialLinksPanel";
 
 /**
@@ -11,6 +12,11 @@ import { SocialLinksPanel } from "./SocialLinksPanel";
  * eye-level slot.
  */
 export function PortalBins() {
+  // Warm the blog cache so the first open of Our Blogs renders complete.
+  useEffect(() => {
+    prefetchBlogPosts().catch(() => {});
+  }, []);
+
   return (
     <div className="w-full flex flex-col gap-2.5">
       <Bin label="Free Resources" defaultOpen bare index={0}>
