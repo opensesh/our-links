@@ -17,7 +17,7 @@ interface BinProps {
 
 /**
  * An "interactive bin": a uniform 52px liquid-glass pill that expands a
- * panel beneath it. Every open bin takes the same aperol tint, so the
+ * panel beneath it. Every open bin brightens the same way, so the
  * open/closed state reads consistently down the stack.
  */
 export function Bin({
@@ -39,6 +39,7 @@ export function Bin({
     <motion.div
       className="bin"
       data-open={open}
+      data-settled={settled}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -83,11 +84,14 @@ export function Bin({
               opacity: { duration: 0.22, ease: "easeOut" },
             }}
             ref={panelRef}
-            style={{ overflow: settled ? "visible" : "hidden" }}
+            className="bin-panel-wrap"
             onAnimationComplete={() => {
+              // The exit animation lands here too, on a panel that is about
+              // to unmount — nothing to hand back to layout.
+              if (!open) return;
               // Content can grow after the open animation measured it
               // (e.g. paginated lists), so hand the height back to layout.
-              if (open && panelRef.current) {
+              if (panelRef.current) {
                 panelRef.current.style.height = "auto";
               }
               setSettled(true);
