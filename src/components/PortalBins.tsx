@@ -2,12 +2,11 @@
 
 import { Bin } from "./Bin";
 import { FreeResourcesPanel } from "./FreeResources";
-import { DesignPhilosophyPanel } from "./DesignPhilosophyPanel";
 import { BlogsPanel } from "./RecentBlogs";
 import { SocialLinksPanel } from "./SocialLinksPanel";
 
 /**
- * The portal's "shelf": four uniform bins ordered by conversion intent.
+ * The portal's "shelf": three uniform bins ordered by conversion intent.
  * Free Resources opens by default until the product waitlist takes the
  * eye-level slot.
  */
@@ -17,13 +16,10 @@ export function PortalBins() {
       <Bin label="Free Resources" defaultOpen bare index={0}>
         <FreeResourcesPanel />
       </Bin>
-      <Bin label="Design Philosophy" index={1}>
-        <DesignPhilosophyPanel />
-      </Bin>
-      <Bin label="Our Blogs" index={2}>
+      <Bin label="Our Blogs" index={1}>
         <BlogsPanel />
       </Bin>
-      <Bin label="Social Links" index={3}>
+      <Bin label="Social Links" index={2}>
         <SocialLinksPanel />
       </Bin>
     </div>
