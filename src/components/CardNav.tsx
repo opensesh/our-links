@@ -81,23 +81,29 @@ function InstagramIcon() {
 
 function LinkedInIcon() {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={assetPath("/icons/social/linkedin.svg")}
-      alt=""
+    <svg
       className="link-icon-svg"
-    />
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect x="2" y="9" width="4" height="12" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
   );
 }
 
 function MediumIcon() {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={assetPath("/icons/social/medium.svg")}
-      alt=""
-      className="link-icon-svg"
-    />
+    <svg className="link-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+      <ellipse cx="6.9" cy="12" rx="5.2" ry="5.4" />
+      <ellipse cx="16.2" cy="12" rx="2.4" ry="5.4" />
+      <ellipse cx="21.3" cy="12" rx="1" ry="5.4" />
+    </svg>
   );
 }
 

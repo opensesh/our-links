@@ -2203,10 +2203,6 @@ button,
   height: 100%;
 }
 
-/* LinkedIn / Medium ship as vanilla-filled SVG files — invert on the vanilla hover */
-.social-tile:hover img.link-icon-svg {
-  filter: invert(1) brightness(0.2);
-}
 
 /* ============================================
    OFFICE JAMS — Spotify embed
