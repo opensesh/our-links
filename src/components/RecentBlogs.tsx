@@ -160,6 +160,25 @@ export function BlogsPanel() {
 
   return (
     <div className="bin-panel-inner">
+      {/* Subscribe leads: it's the one action we want from this bin. */}
+      <form
+        action="https://opensession.substack.com/api/v1/free?nojs=true"
+        method="post"
+        className="subscribe-form mb-4"
+        aria-label="Subscribe to our Substack"
+      >
+        <input
+          type="email"
+          name="email"
+          placeholder="Your email for new posts"
+          required
+          className="subscribe-input"
+        />
+        <button type="submit" className="subscribe-button">
+          Subscribe
+        </button>
+      </form>
+
       {failed ? (
         <p className="text-sm text-[var(--fg-secondary)] py-2">
           Fresh posts live on{" "}
@@ -233,25 +252,6 @@ export function BlogsPanel() {
         </>
       )}
 
-      <div className="mt-5">
-        <form
-          action="https://opensession.substack.com/api/v1/free?nojs=true"
-          method="post"
-          className="subscribe-form"
-        >
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter your email"
-            required
-            className="subscribe-input"
-          />
-          <button type="submit" className="subscribe-button">
-            Subscribe
-          </button>
-        </form>
-        <p className="subscribe-hint">Get our latest posts delivered to your inbox</p>
-      </div>
     </div>
   );
 }
