@@ -8,13 +8,13 @@ import { SocialLinksPanel } from "./SocialLinksPanel";
 
 /**
  * The portal's "shelf": four uniform bins ordered by conversion intent.
- * Free Resources is the primary bin (aperol, open by default) until the
- * product waitlist takes the eye-level slot.
+ * Free Resources opens by default until the product waitlist takes the
+ * eye-level slot.
  */
 export function PortalBins() {
   return (
     <div className="w-full flex flex-col gap-2.5">
-      <Bin label="Free Resources" variant="primary" defaultOpen bare index={0}>
+      <Bin label="Free Resources" defaultOpen bare index={0}>
         <FreeResourcesPanel />
       </Bin>
       <Bin label="Design Philosophy" index={1}>

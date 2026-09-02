@@ -9,8 +9,6 @@ interface BinProps {
   children: ReactNode;
   /** Free Resources ships open on every viewport. */
   defaultOpen?: boolean;
-  /** `primary` = aperol fill while open (the conversion bin); closed bins are all vanilla. */
-  variant?: "primary" | "default";
   /** Position in the stack — drives the page-load stagger. */
   index?: number;
   /** Skip the default dark panel chrome; the child renders its own containers. */
@@ -18,15 +16,14 @@ interface BinProps {
 }
 
 /**
- * An "interactive bin": a uniform 52px pill header that expands a panel
- * beneath it. Visually it borrows the nav pill's DNA (vanilla, 16px radius)
- * so the stack reads as one system with the header above it.
+ * An "interactive bin": a uniform 52px liquid-glass pill that expands a
+ * panel beneath it. Every open bin takes the same aperol tint, so the
+ * open/closed state reads consistently down the stack.
  */
 export function Bin({
   label,
   children,
   defaultOpen = false,
-  variant = "default",
   index = 0,
   bare = false,
 }: BinProps) {
@@ -51,7 +48,7 @@ export function Bin({
     >
       <button
         type="button"
-        className={`bin-header ${variant === "primary" && open ? "bin-header--primary" : ""}`}
+        className="bin-header"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => {

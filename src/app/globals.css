@@ -1514,49 +1514,153 @@ button,
   width: 100%;
 }
 
-/* Frosted glass over the terminal background: enough tint to read as a
-   surface, enough transparency to let the page breathe between the solid
-   vanilla nav and the aperol accents. Vanilla text keeps ~13:1 contrast. */
+/* Liquid glass over the terminal background. Layers, top to bottom:
+   ::after  — hover shimmer sweep
+   ::before — specular highlight (the "curved glass" catch-light)
+   box      — tinted blur, rim light on top, shadow rim below, soft drop
+   Vanilla text keeps ~12:1 contrast on the tint. */
 .bin-header {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   height: 52px;
   padding: 0 16px;
-  border: 1px solid rgba(255, 250, 238, 0.14);
+  border: 1px solid rgba(255, 250, 238, 0.16);
   border-radius: 16px;
-  background: rgba(255, 250, 238, 0.07);
-  box-shadow: inset 0 1px 0 rgba(255, 250, 238, 0.08);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  backdrop-filter: blur(16px) saturate(1.3);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 238, 0.11) 0%,
+    rgba(255, 250, 238, 0.05) 55%,
+    rgba(255, 250, 238, 0.03) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 238, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    inset 0 0 18px rgba(255, 250, 238, 0.05),
+    0 12px 32px rgba(0, 0, 0, 0.38),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5) brightness(1.06);
+  backdrop-filter: blur(22px) saturate(1.5) brightness(1.06);
   color: var(--color-vanilla);
   font-family: inherit;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+
+.bin-header > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Specular catch-light along the top edge */
+.bin-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 90% at 50% -30%, rgba(255, 250, 238, 0.26) 0%, rgba(255, 250, 238, 0) 60%),
+    radial-gradient(60% 120% at 0% 50%, rgba(255, 250, 238, 0.08) 0%, rgba(255, 250, 238, 0) 60%);
+  pointer-events: none;
+}
+
+/* Shimmer sweep, parked off-canvas until hover */
+.bin-header::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  left: 0;
+  width: 38%;
+  z-index: 1;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 250, 238, 0) 20%,
+    rgba(255, 250, 238, 0.22) 50%,
+    rgba(255, 250, 238, 0) 80%
+  );
+  transform: translateX(-160%) skewX(-14deg);
+  pointer-events: none;
 }
 
 .bin-header:hover {
-  background: rgba(255, 250, 238, 0.12);
-  border-color: rgba(255, 250, 238, 0.24);
+  border-color: rgba(255, 250, 238, 0.26);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 238, 0.15) 0%,
+    rgba(255, 250, 238, 0.07) 55%,
+    rgba(255, 250, 238, 0.04) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 238, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    inset 0 0 22px rgba(255, 250, 238, 0.07),
+    0 16px 36px rgba(0, 0, 0, 0.42),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
+}
+
+.bin-header:hover::after {
+  animation: bin-shimmer 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .bin-header:active {
-  transform: scale(0.992);
+  transform: translateY(0) scale(0.995);
 }
 
-/* Open primary bin: aperol-tinted glass instead of a solid block */
-.bin-header--primary {
-  background: rgba(254, 81, 2, 0.26);
-  border-color: rgba(254, 81, 2, 0.5);
-  box-shadow: inset 0 1px 0 rgba(255, 250, 238, 0.1), 0 0 24px rgba(254, 81, 2, 0.12);
+/* Open state — the same aperol tint for every bin */
+.bin-header[aria-expanded="true"] {
+  border-color: rgba(254, 97, 25, 0.5);
+  background: linear-gradient(
+    180deg,
+    rgba(254, 81, 2, 0.36) 0%,
+    rgba(254, 81, 2, 0.2) 55%,
+    rgba(254, 81, 2, 0.14) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 200, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    inset 0 0 22px rgba(254, 81, 2, 0.12),
+    0 12px 32px rgba(254, 81, 2, 0.14),
+    0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-.bin-header--primary:hover {
-  background: rgba(254, 81, 2, 0.36);
-  border-color: rgba(254, 81, 2, 0.65);
+.bin-header[aria-expanded="true"]:hover {
+  border-color: rgba(254, 97, 25, 0.65);
+  background: linear-gradient(
+    180deg,
+    rgba(254, 81, 2, 0.44) 0%,
+    rgba(254, 81, 2, 0.26) 55%,
+    rgba(254, 81, 2, 0.18) 100%
+  );
+}
+
+@keyframes bin-shimmer {
+  to {
+    transform: translateX(420%) skewX(-14deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bin-header,
+  .bin-header:hover {
+    transform: none;
+  }
+
+  .bin-header:hover::after {
+    animation: none;
+  }
 }
 
 .bin-chevron {
