@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { assetPath } from "@/lib/assetPath";
@@ -318,6 +318,32 @@ export function TechStack() {
     return closestIndex;
   }, [selectedIndex]);
 
+  // Center the selected item instantly on mount (and whenever the strip is
+  // resized) so the first tool never lands flush-left before the smooth
+  // scroll below has a chance to run.
+  useLayoutEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const centerInstantly = () => {
+      const el = itemsRef.current[selectedIndex];
+      if (!el) return;
+      const target = el.offsetLeft + el.offsetWidth / 2 - container.offsetWidth / 2;
+      isProgrammaticScroll.current = true;
+      container.scrollTo({ left: target, behavior: "auto" });
+      window.setTimeout(() => {
+        isProgrammaticScroll.current = false;
+      }, 100);
+    };
+
+    centerInstantly();
+    const ro = new ResizeObserver(centerInstantly);
+    ro.observe(container);
+    return () => ro.disconnect();
+    // Mount + resize only; selection changes use the smooth effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Scroll to center the selected item when selection changes programmatically
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -427,11 +453,10 @@ export function TechStack() {
                   msOverflowStyle: "none",
                   WebkitOverflowScrolling: "touch",
                   scrollSnapType: "x mandatory",
+                  // Lets the first and last tools sit dead-centre.
+                  paddingInline: "calc(50% - 50px)",
                 }}
               >
-                {/* Left spacer - allows first items to center */}
-                <div className="shrink-0 w-[calc(50%-50px)]" />
-
                 {techStack.map((item, index) => {
                   const isSelected = selected.id === item.id;
                   // Selected icons are larger (100px vs 72px = 1.4x scale)
@@ -469,9 +494,6 @@ export function TechStack() {
                     </button>
                   );
                 })}
-
-                {/* Spacer to help center alignment at ends */}
-                <div className="shrink-0 w-[calc(50%-50px)]" />
               </div>
             </div>
 
