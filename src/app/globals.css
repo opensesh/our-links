@@ -1073,16 +1073,8 @@ button,
   gap: 12px;
 }
 
-@media (min-width: 640px) {
-  .subscribe-form {
-    flex-direction: row;
-  }
-}
-
 /* Subscribe input */
 .subscribe-input {
-  flex: 1;
-  min-width: 0;
   height: 40px;
   padding: 0 14px;
   font-size: 14px;
@@ -1102,6 +1094,20 @@ button,
   outline: none;
   border-color: rgba(255, 250, 238, 0.45);
   background: rgba(255, 250, 238, 0.09);
+}
+
+/* `flex: 1` lives in the row layout only. In the mobile column layout the main
+   axis is the block axis, so a flex-basis of 0 would beat `height: 40px` and
+   collapse the field to its min-content height. */
+@media (min-width: 640px) {
+  .subscribe-form {
+    flex-direction: row;
+  }
+
+  .subscribe-input {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 /* Subscribe button — the one solid aperol action inside the shelf */
@@ -1692,8 +1698,26 @@ button,
   border: 1px solid #383633;
 }
 
+/* The expanding panel wrapper.
+   Clipping is driven from .bin, not from the wrapper's own props: AnimatePresence
+   renders an exiting child from a snapshot, so state set in the click handler never
+   reaches it. The parent re-renders normally, so this descendant rule always wins —
+   including all the way through the close animation.
+   flow-root keeps the panel's margin-top inside the animated box whether we are
+   clipping or not; without it the margin collapses out the moment overflow turns
+   visible and the gap snaps. */
+.bin-panel-wrap {
+  display: flow-root;
+  overflow: hidden;
+}
+
+/* Settled and open: unclip, so card hover lifts and shadows can escape the panel. */
+.bin[data-open="true"][data-settled="true"] .bin-panel-wrap {
+  overflow: visible;
+}
+
 /* Bin wraps its default panel in 10px of breathing room; bare panels do their own. */
-.bin > div > .bin-panel,
+.bin-panel-wrap > .bin-panel,
 .bin-panel-bare {
   margin-top: 10px;
 }
