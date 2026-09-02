@@ -37,20 +37,6 @@ const COMMON_TAG_STYLES = { bg: "#fffaee", text: "#414651" };
 // Tech stack data with descriptions and tags (order matches Figma)
 const techStack: TechItem[] = [
   {
-    id: "bos",
-    name: "BOS",
-    icon: "/icons/tech/command/bos.svg",
-    url: "https://opensession.co",
-    description:
-      "Our internal brand operating system. Every asset, token, and guideline lives here, and it becomes a public product soon.",
-    tags: [
-      { label: "Design", bg: CATEGORY_COLORS.Design, text: "#fffaee" },
-      { label: "Brand System", ...COMMON_TAG_STYLES },
-      { label: "AI", ...COMMON_TAG_STYLES },
-      { label: "Coming Soon", ...COMMON_TAG_STYLES },
-    ],
-  },
-  {
     id: "claude",
     name: "Claude",
     icon: "/icons/tech/command/claude.png",
@@ -163,6 +149,20 @@ const techStack: TechItem[] = [
     ],
   },
   {
+    id: "bos",
+    name: "BOS",
+    icon: "/icons/tech/command/bos.svg",
+    url: "https://opensession.co",
+    description:
+      "Our internal brand operating system. Every asset, token, and guideline lives here, and it becomes a public product soon.",
+    tags: [
+      { label: "Design", bg: CATEGORY_COLORS.Design, text: "#fffaee" },
+      { label: "Brand System", ...COMMON_TAG_STYLES },
+      { label: "AI", ...COMMON_TAG_STYLES },
+      { label: "Coming Soon", ...COMMON_TAG_STYLES },
+    ],
+  },
+  {
     id: "comet",
     name: "Comet",
     icon: "/icons/tech/command/comet.png",
@@ -263,8 +263,11 @@ const techStack: TechItem[] = [
   },
 ];
 export function TechStack() {
-  // BOS leads the row — it's the tool we want people to meet first.
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  // BOS sits mid-row and is selected on load, so it lands dead-centre with
+  // tools on both sides instead of a gap on the left.
+  const [selectedIndex, setSelectedIndex] = useState(() =>
+    Math.max(0, techStack.findIndex((t) => t.id === "bos"))
+  );
   const selected = techStack[selectedIndex];
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<(HTMLButtonElement | null)[]>([]);
