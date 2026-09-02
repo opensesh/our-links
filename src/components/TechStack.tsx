@@ -408,21 +408,16 @@ export function TechStack() {
   }, [selectedIndex, findCenteredItemIndex]);
 
   return (
-    <section className="w-full mt-8 sm:mt-10 mb-8">
+    <section className="w-full">
       {/* Heading - aligned with max-w content */}
-      <div className="px-4 mb-4">
+      <div className="mb-2">
         <div className="max-w-[var(--content-max-width)] mx-auto">
-          <h2
-            className="text-xl font-bold"
-            style={{ color: "var(--color-vanilla)" }}
-          >
-            Our Tools
-          </h2>
+          <h2 className="section-label">Our Tools</h2>
         </div>
       </div>
 
       {/* Main Container */}
-      <div className="px-4">
+      <div>
         <div className="max-w-[var(--content-max-width)] mx-auto">
           <div
             ref={containerRef}
