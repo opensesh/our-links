@@ -37,6 +37,20 @@ const COMMON_TAG_STYLES = { bg: "#fffaee", text: "#414651" };
 // Tech stack data with descriptions and tags (order matches Figma)
 const techStack: TechItem[] = [
   {
+    id: "bos",
+    name: "BOS",
+    icon: "/icons/tech/command/bos.svg",
+    url: "https://opensession.co",
+    description:
+      "Our internal brand operating system. Every asset, token, and guideline lives here, and it becomes a public product soon.",
+    tags: [
+      { label: "Design", bg: CATEGORY_COLORS.Design, text: "#fffaee" },
+      { label: "Brand System", ...COMMON_TAG_STYLES },
+      { label: "AI", ...COMMON_TAG_STYLES },
+      { label: "Coming Soon", ...COMMON_TAG_STYLES },
+    ],
+  },
+  {
     id: "claude",
     name: "Claude",
     icon: "/icons/tech/command/claude.png",
@@ -51,10 +65,24 @@ const techStack: TechItem[] = [
     ],
   },
   {
+    id: "claude-code",
+    name: "Claude Code",
+    icon: "/icons/tech/command/claude-code.svg",
+    url: "https://claude.com/product/claude-code",
+    description:
+      "The agentic coding tool we live in. It plans, writes, and ships features from the terminal, and Karimo runs on top of it.",
+    tags: [
+      { label: "Coding", bg: CATEGORY_COLORS.Coding, text: "#fffaee" },
+      { label: "AI", ...COMMON_TAG_STYLES },
+      { label: "Agents", ...COMMON_TAG_STYLES },
+      { label: "Paid", ...COMMON_TAG_STYLES },
+    ],
+  },
+  {
     id: "cursor",
     name: "Cursor",
     icon: "/icons/tech/command/cursor.png",
-    url: "https://cursor.sh",
+    url: "https://cursor.com",
     description:
       "Our go-to IDE, though we typically use Claude Code as a VS Code extension instead of paying monthly.",
     tags: [
@@ -93,32 +121,14 @@ const techStack: TechItem[] = [
     ],
   },
   {
-    id: "framer",
-    name: "Framer",
-    icon: "/icons/tech/command/framer.png",
-    url: "https://framer.com",
-    description:
-      "Great for building interactive websites for our clients and our own landing pages and web projects.",
-    tags: [
-      { label: "Design", bg: CATEGORY_COLORS.Design, text: "#fffaee" },
-      { label: "No-Code", ...COMMON_TAG_STYLES },
-      { label: "Website", ...COMMON_TAG_STYLES },
-      { label: "Paid", ...COMMON_TAG_STYLES },
-    ],
-  },
-  {
     id: "notion",
     name: "Notion",
     icon: "/icons/tech/command/notion.png",
-    url: "https://notion.so",
+    url: "https://www.notion.com",
     description:
       "Our all-in-one workspace for notes, tasks, wikis, and database management.",
     tags: [
-      {
-        label: "Productivity",
-        bg: CATEGORY_COLORS.Productivity,
-        text: "#fffaee",
-      },
+      { label: "Productivity", bg: CATEGORY_COLORS.Productivity, text: "#fffaee" },
       { label: "Notes", ...COMMON_TAG_STYLES },
       { label: "Collaboration", ...COMMON_TAG_STYLES },
       { label: "Paid", ...COMMON_TAG_STYLES },
@@ -128,15 +138,11 @@ const techStack: TechItem[] = [
     id: "wispr",
     name: "Wispr Flow",
     icon: "/icons/tech/command/wispr.png",
-    url: "https://wispr.ai",
+    url: "https://wisprflow.ai",
     description:
       "Voice dictation that actually works, helping us capture thoughts at the speed of speech.",
     tags: [
-      {
-        label: "Productivity",
-        bg: CATEGORY_COLORS.Productivity,
-        text: "#fffaee",
-      },
+      { label: "Productivity", bg: CATEGORY_COLORS.Productivity, text: "#fffaee" },
       { label: "Voice", ...COMMON_TAG_STYLES },
       { label: "Mac", ...COMMON_TAG_STYLES },
       { label: "Paid", ...COMMON_TAG_STYLES },
@@ -148,13 +154,9 @@ const techStack: TechItem[] = [
     icon: "/icons/tech/command/obsidian.png",
     url: "https://obsidian.md",
     description:
-      "We use this free open source tool to quickly view and manage markdown files",
+      "We use this free open source tool to quickly view and manage markdown files.",
     tags: [
-      {
-        label: "Productivity",
-        bg: CATEGORY_COLORS.Productivity,
-        text: "#fffaee",
-      },
+      { label: "Productivity", bg: CATEGORY_COLORS.Productivity, text: "#fffaee" },
       { label: "Open Source", ...COMMON_TAG_STYLES },
       { label: "Markdown", ...COMMON_TAG_STYLES },
       { label: "Free", ...COMMON_TAG_STYLES },
@@ -164,7 +166,7 @@ const techStack: TechItem[] = [
     id: "comet",
     name: "Comet",
     icon: "/icons/tech/command/comet.png",
-    url: "https://perplexity.ai/comet",
+    url: "https://www.perplexity.ai/comet",
     description:
       "Our favorite AI browser by Perplexity. We find it incredibly useful for research and browser actions.",
     tags: [
@@ -175,17 +177,31 @@ const techStack: TechItem[] = [
     ],
   },
   {
-    id: "conductor",
-    name: "Conductor",
-    icon: "/icons/tech/command/conductor.png",
-    url: "https://www.conductor.build/",
+    id: "1password",
+    name: "1Password",
+    icon: "/icons/tech/command/1password.svg",
+    url: "https://1password.com",
     description:
-      "For managing multi-agent workflows with Claude Code in a better UI than most IDEs.",
+      "Where every login, API key, and shared credential lives. It also signs our git commits over SSH.",
     tags: [
-      { label: "Coding", bg: CATEGORY_COLORS.Coding, text: "#fffaee" },
-      { label: "AI", ...COMMON_TAG_STYLES },
-      { label: "Multi-Agent", ...COMMON_TAG_STYLES },
-      { label: "Free", ...COMMON_TAG_STYLES },
+      { label: "Productivity", bg: CATEGORY_COLORS.Productivity, text: "#fffaee" },
+      { label: "Security", ...COMMON_TAG_STYLES },
+      { label: "Passwords", ...COMMON_TAG_STYLES },
+      { label: "Paid", ...COMMON_TAG_STYLES },
+    ],
+  },
+  {
+    id: "higgsfield",
+    name: "Higgsfield",
+    icon: "/icons/tech/command/higgsfield.png",
+    url: "https://higgsfield.ai",
+    description:
+      "Our pick for AI video and motion. We storyboard with it, animate stills, and cut quick concept clips.",
+    tags: [
+      { label: "Content", bg: CATEGORY_COLORS.Content, text: "#fffaee" },
+      { label: "AI Video", ...COMMON_TAG_STYLES },
+      { label: "Motion", ...COMMON_TAG_STYLES },
+      { label: "Paid", ...COMMON_TAG_STYLES },
     ],
   },
   {
@@ -231,55 +247,24 @@ const techStack: TechItem[] = [
     ],
   },
   {
-    id: "runway",
-    name: "Runway",
-    icon: "/icons/tech/command/runway.png",
-    url: "https://runway.ml",
-    description:
-      "AI video generation tool that helps us storyboard and create supplementary footage.",
-    smallIcon: true,
-    tags: [
-      { label: "Content", bg: CATEGORY_COLORS.Content, text: "#fffaee" },
-      { label: "AI Video", ...COMMON_TAG_STYLES },
-      { label: "Creative", ...COMMON_TAG_STYLES },
-      { label: "Paid", ...COMMON_TAG_STYLES },
-    ],
-  },
-  {
     id: "openscreen",
     name: "Open Screen",
     icon: "/icons/tech/command/openscreen.png",
-    url: "https://opensession.co",
+    url: "https://getopenscreen.com/",
     description:
-      "A lightweight utility for recording screen captures and sharing quick demos.",
+      "Free, open-source screen recorder for Mac. Quick demos and product clips without a subscription.",
     smallIcon: true,
     tags: [
       { label: "Content", bg: CATEGORY_COLORS.Content, text: "#fffaee" },
-      { label: "Utility", ...COMMON_TAG_STYLES },
-      { label: "Screen", ...COMMON_TAG_STYLES },
+      { label: "Open Source", ...COMMON_TAG_STYLES },
+      { label: "Screen Recording", ...COMMON_TAG_STYLES },
       { label: "Free", ...COMMON_TAG_STYLES },
     ],
   },
-  {
-    id: "midjourney",
-    name: "Midjourney",
-    icon: "/icons/tech/command/midjourney.png",
-    url: "https://midjourney.com",
-    description:
-      "Our primary tool for generating creative imagery and conceptual art assets.",
-    smallIcon: true,
-    tags: [
-      { label: "Content", bg: CATEGORY_COLORS.Content, text: "#fffaee" },
-      { label: "AI Art", ...COMMON_TAG_STYLES },
-      { label: "Image", ...COMMON_TAG_STYLES },
-      { label: "Paid", ...COMMON_TAG_STYLES },
-    ],
-  },
 ];
-
 export function TechStack() {
-  // Default to Obsidian (index 7) as shown in Figma
-  const [selectedIndex, setSelectedIndex] = useState(7);
+  // BOS leads the row — it's the tool we want people to meet first.
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const selected = techStack[selectedIndex];
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<(HTMLButtonElement | null)[]>([]);
