@@ -32,7 +32,8 @@ function Equalizer() {
  * "Office Jams" — the studio playlist, above the fold.
  *
  * Nothing from Spotify loads until the first tap on play. That tap injects
- * the Embed iFrame API, mounts the player, and starts playback; from then on
+ * the Embed iFrame API, mounts the player, and (on pointer devices) starts
+ * playback; from then on
  * the aperol button and the vinyl toggle the same controller, and the record
  * spins (with an aperol glow) only while audio is actually playing.
  */
@@ -59,6 +60,11 @@ export function SpotifyCard() {
       setStatus((s) => (s === "loading" ? "fallback" : s));
     }, READY_TIMEOUT_MS);
 
+    // Programmatic play on touch devices trips Spotify's "Get Spotify"
+    // interstitial for signed-out listeners, so there we only mount the
+    // player and let its own play button start audio.
+    const autoplay = !window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
     try {
       const api = await loadSpotifyIframeApi();
       // The API replaces the element we hand it with an <iframe>, so give it a
@@ -74,7 +80,7 @@ export function SpotifyCard() {
           controller.addListener("ready", () => {
             clearReadyTimer();
             setStatus("ready");
-            controller.play();
+            if (autoplay) controller.play();
           });
           controller.addListener("playback_update", (e) => {
             clearReadyTimer();
