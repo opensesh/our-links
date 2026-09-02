@@ -8,8 +8,8 @@ import { UnderlineLink } from "./UnderlineLink";
 export function Hero() {
   return (
     <section className="w-full mt-3 sm:mt-4">
-      <div className="max-w-[var(--content-max-width)] mx-auto text-left md:flex md:items-end md:justify-between md:gap-8">
-        <div>
+      <div className="max-w-[var(--content-max-width)] mx-auto text-left lg:flex lg:items-end lg:justify-between lg:gap-8">
+        <div className="min-w-0">
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -32,18 +32,18 @@ export function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.9 }}
-            className="text-sm text-[var(--fg-secondary)] md:max-w-[412px]"
+            className="text-sm text-[var(--fg-secondary)] lg:max-w-[412px]"
           >
             We build open-source resources and revolutionary products.
           </motion.p>
         </div>
 
-        {/* CTAs step aside on mobile so the resources land above the fold. */}
+        {/* CTAs stack under the copy until the container widens to 900px at lg. */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.05 }}
-          className="hidden md:flex items-center gap-4 flex-wrap justify-end shrink-0"
+          className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 lg:mt-0 lg:justify-end lg:shrink-0"
         >
           <ActionButton href="https://opensession.co/contact" external size="lg">
             Contact Us
