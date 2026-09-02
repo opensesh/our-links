@@ -14,7 +14,7 @@ import { SocialLinksPanel } from "./SocialLinksPanel";
 export function PortalBins() {
   return (
     <div className="w-full flex flex-col gap-2.5">
-      <Bin label="Free Resources" variant="primary" defaultOpen index={0}>
+      <Bin label="Free Resources" variant="primary" defaultOpen bare index={0}>
         <FreeResourcesPanel />
       </Bin>
       <Bin label="Design Philosophy" index={1}>

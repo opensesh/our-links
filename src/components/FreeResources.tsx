@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
-import { ArrowUpRight, Figma, Github } from "lucide-react";
+import { ArrowUpRight, Figma, Github, Globe } from "lucide-react";
 import { SubscribeModal, hasResourceAccess } from "./SubscribeModal";
 import { assetPath } from "@/lib/assetPath";
 
@@ -41,25 +41,25 @@ function ChevronRightIcon() {
 }
 
 type ResourceCategory = "creative" | "code";
-type ResourceTool = "figma" | "github";
+type ResourceLink = "figma" | "github" | "website";
 type CategoryFilter = "all" | ResourceCategory;
 
-interface ResourceCard {
+interface Resource {
   id: string;
-  badge: { text: string; variant: "coming-soon" | "live" };
-  mediaDefault: string;
-  mediaType: "image" | "video";
-  imageHover: string;
-  /** Square-safe still used by the compact mobile row. */
-  thumb: string;
   title: string;
   description: string;
   href: string;
-  buttonLabel: string;
+  /** Desktop card artwork (may be a gif or mp4). */
+  cover: string;
+  coverType: "image" | "video";
+  /** Desktop hover artwork. */
+  coverHover: string;
+  /** Square-safe still for the compact mobile row. */
+  thumb: string;
   categories: ResourceCategory[];
-  tool: ResourceTool;
+  link: ResourceLink;
   dateAdded: string; // ISO YYYY-MM-DD
-  /** Pinned to the top of the list with a "Popular" badge. */
+  /** Pinned to the top with a "Popular" badge. */
   featured?: boolean;
 }
 
@@ -68,14 +68,16 @@ const CATEGORY_LABEL: Record<ResourceCategory, string> = {
   code: "Code",
 };
 
-const TOOL_LABEL: Record<ResourceTool, string> = {
+const LINK_LABEL: Record<ResourceLink, string> = {
   figma: "Figma",
   github: "GitHub",
+  website: "Website",
 };
 
-const TOOL_ICON: Record<ResourceTool, React.ComponentType<{ className?: string }>> = {
+const LINK_ICON: Record<ResourceLink, React.ComponentType<{ className?: string }>> = {
   figma: Figma,
   github: Github,
+  website: Globe,
 };
 
 function formatDateAdded(iso: string): string {
@@ -86,313 +88,165 @@ function formatDateAdded(iso: string): string {
   });
 }
 
-const resourceCards: ResourceCard[] = [
+const resources: Resource[] = [
   {
     id: "portfolio",
-    badge: { text: "Live", variant: "live" },
-    mediaDefault: "/images/portfolio-01.jpg",
-    mediaType: "image",
-    imageHover: "/images/portfolio-02.jpg",
-    thumb: "/images/portfolio-01.jpg",
     title: "Portfolio Template",
     description:
       "Our co-founder's portfolio that helped him land jobs at Google, Salesforce, and other Fortune 500 companies. Open source and ready to customize",
     href: "https://www.figma.com/community/file/1597821544420498783/portfolio-presentation-template-built-to-land-offers",
-    buttonLabel: "Figma",
+    cover: "/images/portfolio-01.jpg",
+    coverType: "image",
+    coverHover: "/images/portfolio-02.jpg",
+    thumb: "/images/portfolio-01.jpg",
     categories: ["creative"],
-    tool: "figma",
+    link: "figma",
     dateAdded: "2026-02-13",
   },
   {
     id: "design-directory",
-    badge: { text: "Live", variant: "live" },
-    mediaDefault: "/images/design-directory-01.mp4",
-    mediaType: "video",
-    imageHover: "/images/design-directory-02.jpg",
-    thumb: "/images/design-directory-02.jpg",
     title: "Design Directory",
     description:
       "All of our favorite design tools in one interactive directory. Open-source and ready to adapt for your own creative workflow.",
     href: "https://design-directory-blue.vercel.app/",
-    buttonLabel: "Website",
+    cover: "/images/design-directory-01.mp4",
+    coverType: "video",
+    coverHover: "/images/design-directory-02.jpg",
+    thumb: "/images/design-directory-02.jpg",
     categories: ["creative", "code"],
-    tool: "github",
+    link: "website",
     dateAdded: "2026-03-03",
   },
   {
     id: "brand-design-system",
-    badge: { text: "Live", variant: "live" },
-    mediaDefault: "/images/brand-design-system-01.jpg",
-    mediaType: "image",
-    imageHover: "/images/brand-design-system-02.jpg",
-    thumb: "/images/brand-design-system-01.jpg",
     title: "Brand Design System",
     description:
       "Comprehensive design system optimized for brand identity in the AI era. Fully configurable with connected variables and ready to customize.",
     href: "https://www.figma.com/community/file/1618448560463755361",
-    buttonLabel: "Figma",
+    cover: "/images/brand-design-system-01.jpg",
+    coverType: "image",
+    coverHover: "/images/brand-design-system-02.jpg",
+    thumb: "/images/brand-design-system-01.jpg",
     categories: ["creative"],
-    tool: "figma",
+    link: "figma",
     dateAdded: "2026-03-26",
     featured: true,
   },
   {
     id: "linktree-template",
-    badge: { text: "Live", variant: "live" },
-    mediaDefault: "/images/linktree-template-01.jpg",
-    mediaType: "image",
-    imageHover: "/images/linktree-template-02.jpg",
-    thumb: "/images/linktree-template-01.jpg",
     title: "Linktree Template",
     description:
       "A beautiful, customizable link portal template built with Next.js. Open-source and ready to adapt for your own brand.",
     href: "https://github.com/opensesh/linktree-alternative",
-    buttonLabel: "GitHub",
+    cover: "/images/linktree-template-01.jpg",
+    coverType: "image",
+    coverHover: "/images/linktree-template-02.jpg",
+    thumb: "/images/linktree-template-01.jpg",
     categories: ["code"],
-    tool: "github",
+    link: "github",
     dateAdded: "2026-03-09",
   },
   {
     id: "karimo",
-    badge: { text: "Live", variant: "live" },
-    mediaDefault: "/images/karimo-01.gif",
-    mediaType: "image",
-    imageHover: "/images/karimo-02.jpg",
-    thumb: "/images/karimo-02.jpg",
     title: "Claude Code Harness",
     description:
       "Karimo is a framework and Claude Code plugin for PRD-driven autonomous development. Think of it as plan mode on steroids.",
     href: "https://github.com/opensesh/KARIMO",
-    buttonLabel: "GitHub",
+    cover: "/images/karimo-01.gif",
+    coverType: "image",
+    coverHover: "/images/karimo-02.jpg",
+    thumb: "/images/karimo-02.jpg",
     categories: ["code"],
-    tool: "github",
+    link: "github",
     dateAdded: "2026-05-01",
   },
 ];
 
-function Badge({ text, variant }: { text: string; variant: "coming-soon" | "live" }) {
-  const badgeClass = variant === "coming-soon" ? "badge-coming-soon" : "badge-live";
-  return (
-    <span className={`resource-card-badge font-medium rounded-full ${badgeClass}`}>
-      {text}
-    </span>
-  );
-}
+/* ---------- Resource item — one component, two layouts ----------
+   Below `lg` the CSS lays it out as a compact row (thumb · title · meta).
+   At `lg+` the same markup becomes the visual card (cover · title · date ·
+   description · meta). Nothing is duplicated; only the stylesheet changes. */
 
-/* ---------- Desktop: visual card ---------- */
-
-function ResourceCardComponent({
-  card,
-  onCardClick,
+function ResourceItem({
+  resource,
+  onPage,
+  onSelect,
 }: {
-  card: ResourceCard;
-  onCardClick: (card: ResourceCard) => void;
+  resource: Resource;
+  onPage: boolean;
+  onSelect: (resource: Resource) => void;
 }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const isLive = card.badge.variant === "live";
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isLive) {
-      onCardClick(card);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.key === "Enter" || e.key === " ") && isLive) {
-      e.preventDefault();
-      onCardClick(card);
-    }
-  };
+  const LinkIcon = LINK_ICON[resource.link];
+  const date = formatDateAdded(resource.dateAdded);
 
   return (
-    <motion.div
-      className={`resource-card w-full flex flex-col ${isLive ? "cursor-pointer" : ""}`}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      role={isLive ? "button" : undefined}
-      tabIndex={isLive ? 0 : undefined}
-    >
-      {/* Image/Video Area - rounded-t-[11px] to account for 1px border */}
-      <div className="relative bg-[#191919] rounded-t-[11px] overflow-hidden h-48">
-        {card.mediaType === "video" ? (
-          <motion.video
-            src={assetPath(card.mediaDefault)}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover object-top"
-            animate={{
-              scale: isHovered ? 1.02 : 1,
-              opacity: isHovered ? 0 : 1,
-            }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          />
-        ) : (
-          <motion.img
-            src={assetPath(card.mediaDefault)}
-            alt={card.title}
-            className="absolute inset-0 w-full h-full object-cover object-top"
-            animate={{
-              scale: isHovered ? 1.02 : 1,
-              opacity: isHovered ? 0 : 1,
-            }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          />
-        )}
-
-        <motion.img
-          src={assetPath(card.imageHover)}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-top"
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{
-            opacity: isHovered ? 1 : 0,
-            scale: isHovered ? 1 : 1.05,
-          }}
-          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-        />
-
-        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
-          <Badge text={card.badge.text} variant={card.badge.variant} />
-        </div>
-      </div>
-
-      <div className="resource-card-content flex flex-col flex-grow">
-        <div className="resource-card-title-row">
-          <h3 className="resource-card-title font-accent font-bold text-[var(--color-vanilla)]">
-            {card.title}
-          </h3>
-          <span className="resource-card-date" aria-label={`Added ${formatDateAdded(card.dateAdded)}`}>
-            {formatDateAdded(card.dateAdded)}
-          </span>
-        </div>
-        <p className="resource-card-description text-[var(--color-vanilla)]/70 line-clamp-2 sm:line-clamp-3 flex-grow">
-          {card.description}
-        </p>
-        <div className="resource-card-footer">
-          <div className="resource-card-tags">
-            {card.categories.map((c) => (
-              <span key={c} className="resource-card-tag">
-                {CATEGORY_LABEL[c]}
-              </span>
-            ))}
-            <span className="resource-card-tag resource-card-tag--tool">
-              {(() => {
-                const Icon = TOOL_ICON[card.tool];
-                return <Icon className="resource-card-tag-icon" />;
-              })()}
-              {TOOL_LABEL[card.tool]}
-            </span>
-          </div>
-          <ArrowUpRight className="resource-card-arrow" aria-hidden="true" />
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function CarouselPagination({
-  currentPage,
-  totalPages,
-  onPrevious,
-  onNext,
-  onDotClick,
-}: {
-  currentPage: number;
-  totalPages: number;
-  onPrevious: () => void;
-  onNext: () => void;
-  onDotClick: (index: number) => void;
-}) {
-  return (
-    <div className="resource-pagination">
+    <li className="resource-item" data-offpage={!onPage}>
       <button
-        className="resource-nav-arrow"
-        onClick={onPrevious}
-        disabled={currentPage === 0}
-        aria-label="Previous resource"
+        type="button"
+        className="resource-item-button"
+        onClick={() => onSelect(resource)}
       >
-        <ChevronLeftIcon />
-      </button>
-
-      <div className="resource-dots">
-        {Array.from({ length: totalPages }).map((_, index) => (
-          <button
-            key={index}
-            className={`resource-pagination-dot ${currentPage === index ? "active" : ""}`}
-            onClick={() => onDotClick(index)}
-            aria-label={`Go to page ${index + 1}`}
+        <span className="resource-item-media">
+          <img
+            src={assetPath(resource.thumb)}
+            alt=""
+            className="resource-item-thumb"
+            loading="lazy"
+            draggable={false}
           />
-        ))}
-      </div>
-
-      <button
-        className="resource-nav-arrow"
-        onClick={onNext}
-        disabled={currentPage === totalPages - 1}
-        aria-label="Next resource"
-      >
-        <ChevronRightIcon />
-      </button>
-    </div>
-  );
-}
-
-function getCardPages(cards: ResourceCard[], size: number): ResourceCard[][] {
-  const pages: ResourceCard[][] = [];
-  for (let i = 0; i < cards.length; i += size) {
-    pages.push(cards.slice(i, i + size));
-  }
-  return pages;
-}
-
-/* ---------- Mobile: compact row ---------- */
-
-function ResourceRow({
-  card,
-  onClick,
-}: {
-  card: ResourceCard;
-  onClick: (card: ResourceCard) => void;
-}) {
-  const meta = [
-    card.categories.map((c) => CATEGORY_LABEL[c]).join(" + "),
-    card.buttonLabel,
-    formatDateAdded(card.dateAdded),
-  ].join(" · ");
-
-  return (
-    <motion.li
-      layout
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-    >
-      <button type="button" className="resource-row" onClick={() => onClick(card)}>
-        <img
-          src={assetPath(card.thumb)}
-          alt=""
-          className="resource-row-thumb"
-          loading="lazy"
-          draggable={false}
-        />
-        <span className="resource-row-body">
-          <span className="resource-row-title">{card.title}</span>
-          <span className="resource-row-meta">{meta}</span>
+          {resource.coverType === "video" ? (
+            <video
+              src={assetPath(resource.cover)}
+              className="resource-item-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          ) : (
+            <img
+              src={assetPath(resource.cover)}
+              alt=""
+              className="resource-item-cover"
+              loading="lazy"
+              draggable={false}
+            />
+          )}
+          <img
+            src={assetPath(resource.coverHover)}
+            alt=""
+            className="resource-item-cover-hover"
+            loading="lazy"
+            draggable={false}
+          />
         </span>
-        {card.featured && <span className="resource-row-badge">Popular</span>}
-        <ArrowUpRight className="resource-row-arrow" aria-hidden="true" />
+
+        <span className="resource-item-body">
+          <span className="resource-item-title-row">
+            <span className="resource-item-title">{resource.title}</span>
+            <span className="resource-item-date">{date}</span>
+          </span>
+          <span className="resource-item-description">{resource.description}</span>
+          <span className="resource-item-meta">
+            <span>{resource.categories.map((c) => CATEGORY_LABEL[c]).join(" + ")}</span>
+            <span className="resource-item-meta-dot">·</span>
+            <LinkIcon className="resource-item-meta-icon" />
+            <span>{LINK_LABEL[resource.link]}</span>
+            <span className="resource-item-meta-date">
+              <span className="resource-item-meta-dot">·</span>
+              {date}
+            </span>
+          </span>
+        </span>
+
+        {resource.featured && <span className="resource-item-badge">Popular</span>}
+        <ArrowUpRight className="resource-item-arrow" aria-hidden="true" />
       </button>
-    </motion.li>
+    </li>
   );
 }
 
-/* ---------- Category chips ---------- */
+/* ---------- Toolbar: chips (+ desktop pagination) ---------- */
 
 const CHIP_OPTIONS: { value: CategoryFilter; label: string }[] = [
   { value: "all", label: "All" },
@@ -423,7 +277,7 @@ function ResourceChips({
               <motion.span
                 layoutId="resource-chip-active"
                 className="resource-chip-bg"
-                transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                transition={{ type: "spring", stiffness: 520, damping: 42, mass: 0.8 }}
               />
             )}
             <span className="resource-chip-label">{opt.label}</span>
@@ -434,26 +288,68 @@ function ResourceChips({
   );
 }
 
+function Pagination({
+  currentPage,
+  totalPages,
+  onChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onChange: (page: number) => void;
+}) {
+  return (
+    <div className="resource-pagination resource-toolbar-pagination">
+      <button
+        type="button"
+        className="resource-nav-arrow"
+        onClick={() => onChange(Math.max(0, currentPage - 1))}
+        disabled={currentPage === 0}
+        aria-label="Previous resources"
+      >
+        <ChevronLeftIcon />
+      </button>
+
+      <div className="resource-dots">
+        {Array.from({ length: totalPages }).map((_, index) => (
+          <button
+            key={index}
+            type="button"
+            className={`resource-pagination-dot ${currentPage === index ? "active" : ""}`}
+            onClick={() => onChange(index)}
+            aria-label={`Go to page ${index + 1}`}
+          />
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className="resource-nav-arrow"
+        onClick={() => onChange(Math.min(totalPages - 1, currentPage + 1))}
+        disabled={currentPage === totalPages - 1}
+        aria-label="Next resources"
+      >
+        <ChevronRightIcon />
+      </button>
+    </div>
+  );
+}
+
 /* ---------- Panel ---------- */
 
-const CARDS_PER_PAGE = 3;
+/** Desktop cards per page. Below lg every item is visible, so paging is moot. */
+const PAGE_SIZE = 3;
 
-/**
- * Body of the Free Resources bin. Renders compact rows below `lg` and the
- * visual card carousel at `lg+` — both are in the DOM and toggled with CSS
- * so there's no layout flash on hydration.
- */
 export function FreeResourcesPanel() {
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
-    card: ResourceCard | null;
-  }>({ isOpen: false, card: null });
+    resource: Resource | null;
+  }>({ isOpen: false, resource: null });
 
   const [category, setCategory] = useState<CategoryFilter>("all");
-  const [currentPage, setCurrentPage] = useState(0);
+  const [page, setPage] = useState(0);
 
-  const visibleResources = useMemo(() => {
-    const filtered = resourceCards.filter(
+  const visible = useMemo(() => {
+    const filtered = resources.filter(
       (r) => category === "all" || r.categories.includes(category)
     );
     // Featured first, then newest.
@@ -463,86 +359,60 @@ export function FreeResourcesPanel() {
     });
   }, [category]);
 
-  const cardPages = useMemo(
-    () => getCardPages(visibleResources, CARDS_PER_PAGE),
-    [visibleResources]
-  );
-  const totalPages = Math.max(cardPages.length, 1);
-  const safePageIndex = Math.min(currentPage, totalPages - 1);
-  const currentPageCards = cardPages[safePageIndex] ?? [];
+  const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
 
   const handleCategoryChange = (next: CategoryFilter) => {
     setCategory(next);
-    setCurrentPage(0);
+    setPage(0);
   };
 
-  const handleCardClick = (card: ResourceCard) => {
+  const handleSelect = (resource: Resource) => {
     if (hasResourceAccess()) {
-      window.open(card.href, "_blank", "noopener,noreferrer");
+      window.open(resource.href, "_blank", "noopener,noreferrer");
       return;
     }
-    setModalState({ isOpen: true, card });
+    setModalState({ isOpen: true, resource });
   };
 
   const handleCloseModal = () => {
-    setModalState({ isOpen: false, card: null });
+    setModalState({ isOpen: false, resource: null });
   };
 
   return (
     <>
-      <ResourceChips value={category} onChange={handleCategoryChange} />
+      <div className="resource-toolbar">
+        <ResourceChips value={category} onChange={handleCategoryChange} />
+        {totalPages > 1 && (
+          <Pagination currentPage={safePage} totalPages={totalPages} onChange={setPage} />
+        )}
+      </div>
 
-      {/* Mobile / tablet: compact list — every resource visible at once */}
-      <ul className="resource-rows lg:hidden">
-        <AnimatePresence initial={false}>
-          {visibleResources.map((card) => (
-            <ResourceRow key={card.id} card={card} onClick={handleCardClick} />
-          ))}
-        </AnimatePresence>
-      </ul>
-
-      {/* Desktop: visual card carousel, 3 per page */}
-      <div className="hidden lg:block px-[10px] pb-[10px]">
-        <div
-          className={`resource-carousel-wrapper ${cardPages.length > 1 ? "resource-carousel-wrapper--multi" : ""}`}
+      <div className="bin-panel">
+        <motion.ul
+          key={`${category}-${safePage}`}
+          className="resource-list"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${safePageIndex}-${category}`}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="resource-card-page"
-            >
-              {currentPageCards.map((card) => (
-                <ResourceCardComponent
-                  key={card.id}
-                  card={card}
-                  onCardClick={handleCardClick}
-                />
-              ))}
-            </motion.div>
-          </AnimatePresence>
-
-          {totalPages > 1 && (
-            <CarouselPagination
-              currentPage={safePageIndex}
-              totalPages={totalPages}
-              onPrevious={() => setCurrentPage((p) => Math.max(0, p - 1))}
-              onNext={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
-              onDotClick={setCurrentPage}
+          {visible.map((resource, index) => (
+            <ResourceItem
+              key={resource.id}
+              resource={resource}
+              onPage={Math.floor(index / PAGE_SIZE) === safePage}
+              onSelect={handleSelect}
             />
-          )}
-        </div>
+          ))}
+        </motion.ul>
       </div>
 
       <SubscribeModal
         isOpen={modalState.isOpen}
         onClose={handleCloseModal}
         onSkip={handleCloseModal}
-        resourceTitle={modalState.card?.title ?? ""}
-        resourceHref={modalState.card?.href ?? "#"}
+        resourceTitle={modalState.resource?.title ?? ""}
+        resourceHref={modalState.resource?.href ?? "#"}
       />
     </>
   );

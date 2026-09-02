@@ -13,6 +13,8 @@ interface BinProps {
   variant?: "primary" | "default";
   /** Position in the stack — drives the page-load stagger. */
   index?: number;
+  /** Skip the default dark panel chrome; the child renders its own containers. */
+  bare?: boolean;
 }
 
 /**
@@ -26,6 +28,7 @@ export function Bin({
   defaultOpen = false,
   variant = "default",
   index = 0,
+  bare = false,
 }: BinProps) {
   const [open, setOpen] = useState(defaultOpen);
   // While the height animation runs we clip; once settled we let card hover
@@ -84,7 +87,11 @@ export function Bin({
             style={{ overflow: settled ? "visible" : "hidden" }}
             onAnimationComplete={() => setSettled(true)}
           >
-            <div className="bin-panel">{children}</div>
+            {bare ? (
+              <div className="bin-panel-bare">{children}</div>
+            ) : (
+              <div className="bin-panel">{children}</div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
