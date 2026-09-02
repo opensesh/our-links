@@ -20,7 +20,7 @@ export default function Home() {
       >
         {/* SCROLLER - handles scrolling, scrollbar at viewport edge */}
         <div className="h-full overflow-y-auto overflow-x-hidden px-[clamp(1rem,4vw,3rem)]">
-          <main className="flex flex-col items-center pt-4 pb-8 gap-6 sm:gap-8 px-4 max-w-[var(--content-max-width)] mx-auto">
+          <main className="flex flex-col items-center pt-4 pb-8 gap-10 sm:gap-16 px-4 max-w-[var(--content-max-width)] mx-auto">
             <Hero />
             <PortalBins />
             <SpotifyCard />

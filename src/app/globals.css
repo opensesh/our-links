@@ -1082,44 +1082,48 @@ button,
 /* Subscribe input */
 .subscribe-input {
   flex: 1;
-  padding: 12px 16px;
-  font-size: 14px;
+  min-width: 0;
+  padding: 13px 16px;
+  font-size: 15px;
   font-family: inherit;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-secondary);
-  border-radius: 8px;
-  color: var(--fg-primary);
+  background: rgba(255, 250, 238, 0.06);
+  border: 1px solid rgba(255, 250, 238, 0.2);
+  border-radius: 10px;
+  color: var(--color-vanilla);
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .subscribe-input::placeholder {
-  color: var(--fg-quaternary);
+  color: rgba(255, 250, 238, 0.55);
 }
 
 .subscribe-input:focus {
   outline: none;
-  border-color: var(--border-primary);
-  background: var(--bg-secondary_hover);
+  border-color: rgba(255, 250, 238, 0.45);
+  background: rgba(255, 250, 238, 0.09);
 }
 
-/* Subscribe button */
+/* Subscribe button — the one solid aperol action inside the shelf */
 .subscribe-button {
-  padding: 12px 24px;
+  padding: 13px 22px;
   font-size: 14px;
   font-weight: 500;
   font-family: inherit;
-  background: var(--bg-secondary);
+  background: var(--color-aperol);
   color: var(--color-vanilla);
-  border: 1px solid var(--border-secondary);
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.15s ease;
   white-space: nowrap;
 }
 
 .subscribe-button:hover {
-  border-color: var(--border-brand);
-  background: var(--bg-secondary_hover);
+  background: var(--color-brand-600);
+}
+
+.subscribe-button:active {
+  transform: scale(0.98);
 }
 
 /* Hint text below form */
@@ -1510,6 +1514,9 @@ button,
   width: 100%;
 }
 
+/* Frosted glass over the terminal background: enough tint to read as a
+   surface, enough transparency to let the page breathe between the solid
+   vanilla nav and the aperol accents. Vanilla text keeps ~13:1 contrast. */
 .bin-header {
   display: flex;
   align-items: center;
@@ -1517,32 +1524,39 @@ button,
   width: 100%;
   height: 52px;
   padding: 0 16px;
-  border: 0;
+  border: 1px solid rgba(255, 250, 238, 0.14);
   border-radius: 16px;
-  background: var(--color-vanilla);
-  color: var(--color-charcoal);
+  background: rgba(255, 250, 238, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 250, 238, 0.08);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  color: var(--color-vanilla);
   font-family: inherit;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .bin-header:hover {
-  background: #f3eee0;
+  background: rgba(255, 250, 238, 0.12);
+  border-color: rgba(255, 250, 238, 0.24);
 }
 
 .bin-header:active {
   transform: scale(0.992);
 }
 
+/* Open primary bin: aperol-tinted glass instead of a solid block */
 .bin-header--primary {
-  background: var(--color-aperol);
-  color: var(--color-vanilla);
+  background: rgba(254, 81, 2, 0.26);
+  border-color: rgba(254, 81, 2, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 250, 238, 0.1), 0 0 24px rgba(254, 81, 2, 0.12);
 }
 
 .bin-header--primary:hover {
-  background: var(--color-brand-600);
+  background: rgba(254, 81, 2, 0.36);
+  border-color: rgba(254, 81, 2, 0.65);
 }
 
 .bin-chevron {
@@ -2013,7 +2027,7 @@ button,
 
 .spotify-embed {
   position: relative;
-  height: 352px;
+  height: 520px;
   border-radius: 12px;
   overflow: hidden;
   background: #191919;
