@@ -20,7 +20,6 @@ interface TechItem {
   url: string;
   description: string;
   tags: TagData[];
-  smallIcon?: boolean;
 }
 
 // Category colors for primary tags
@@ -33,6 +32,13 @@ const CATEGORY_COLORS = {
 };
 
 const COMMON_TAG_STYLES = { bg: "#fffaee", text: "#414651" };
+
+// Every icon asset is a full-bleed square tile, so the strip - not the artwork -
+// owns tile size and corner radius. That keeps all tools identical at rest and
+// identical again when selected, regardless of how a given icon was exported.
+const TILE_REST = 58;
+const TILE_SELECTED = 82;
+const TILE_RADIUS = "22.5%"; // proportional, so it holds at both sizes
 
 // Tech stack data with descriptions and tags (order matches Figma)
 const techStack: TechItem[] = [
@@ -253,7 +259,6 @@ const techStack: TechItem[] = [
     url: "https://getopenscreen.com/",
     description:
       "Free, open-source screen recorder for Mac. Quick demos and product clips without a subscription.",
-    smallIcon: true,
     tags: [
       { label: "Content", bg: CATEGORY_COLORS.Content, text: "#fffaee" },
       { label: "Open Source", ...COMMON_TAG_STYLES },
@@ -450,20 +455,19 @@ export function TechStack() {
             <div style={{ background: "#4a4a4a", height: 132 }}>
               <div
                 ref={scrollContainerRef}
-                className="flex items-center gap-4 py-4 overflow-x-auto w-full h-full [&::-webkit-scrollbar]:hidden"
+                className="flex items-center gap-[30px] py-4 overflow-x-auto w-full h-full [&::-webkit-scrollbar]:hidden"
                 style={{
                   scrollbarWidth: "none",
                   msOverflowStyle: "none",
                   WebkitOverflowScrolling: "touch",
                   scrollSnapType: "x mandatory",
                   // Lets the first and last tools sit dead-centre.
-                  paddingInline: "calc(50% - 50px)",
+                  paddingInline: `calc(50% - ${TILE_SELECTED / 2}px)`,
                 }}
               >
                 {techStack.map((item, index) => {
                   const isSelected = selected.id === item.id;
-                  // Selected icons are larger (100px vs 72px = 1.4x scale)
-                  const size = isSelected ? 100 : 72;
+                  const size = isSelected ? TILE_SELECTED : TILE_REST;
 
                   return (
                     <button
@@ -473,7 +477,7 @@ export function TechStack() {
                         itemsRef.current[index] = el;
                       }}
                       onClick={() => setSelectedIndex(index)}
-                      className={`relative shrink-0 rounded-xl transition-all duration-300 flex items-center justify-center ${
+                      className={`relative shrink-0 transition-all duration-300 flex items-center justify-center ${
                         isSelected
                           ? "z-10 opacity-100"
                           : "opacity-50 hover:opacity-100"
@@ -481,6 +485,7 @@ export function TechStack() {
                       style={{
                         width: size,
                         height: size,
+                        borderRadius: TILE_RADIUS,
                         scrollSnapAlign: "center",
                       }}
                       role="option"
@@ -490,9 +495,8 @@ export function TechStack() {
                       <img
                         src={assetPath(item.icon)}
                         alt={item.name}
-                        className={`object-cover rounded-[10px] ${
-                          item.smallIcon && !isSelected ? "w-[57px] h-[57px]" : "w-full h-full"
-                        }`}
+                        className="object-cover w-full h-full"
+                        style={{ borderRadius: TILE_RADIUS }}
                       />
                     </button>
                   );
