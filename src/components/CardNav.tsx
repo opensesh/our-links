@@ -146,7 +146,7 @@ interface SocialLink {
   icon: React.ReactNode;
 }
 
-const socialLinks: SocialLink[] = [
+export const socialLinks: SocialLink[] = [
   {
     id: "github",
     label: "Github",

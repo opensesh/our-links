@@ -1,8 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpDown } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 interface BlogPost {
   id: string;
@@ -13,13 +12,6 @@ interface BlogPost {
   imageUrl: string | null;
   link: string;
 }
-
-type SortOrder = "recent" | "oldest";
-
-const SORT_LABEL: Record<SortOrder, string> = {
-  recent: "Recently added",
-  oldest: "Oldest first",
-};
 
 const PAGE_SIZE = 3;
 
@@ -124,16 +116,12 @@ function BlogCardSkeleton() {
   );
 }
 
-export function RecentBlogs() {
+/** Body of the "Our Blogs" bin: newest posts, paged, plus the Substack form. */
+export function BlogsPanel() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-
-  const [sortBy, setSortBy] = useState<SortOrder>("recent");
-  const [sortOpen, setSortOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-
-  const sortRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     async function loadPosts() {
@@ -155,203 +143,115 @@ export function RecentBlogs() {
     loadPosts();
   }, []);
 
-  const sortedPosts = useMemo(() => {
-    return [...posts].sort((a, b) => {
-      const ta = getPostTimestamp(a);
-      const tb = getPostTimestamp(b);
-      return sortBy === "recent" ? tb - ta : ta - tb;
-    });
-  }, [posts, sortBy]);
-
   const pages = useMemo(() => {
+    const sorted = [...posts].sort((a, b) => getPostTimestamp(b) - getPostTimestamp(a));
     const out: BlogPost[][] = [];
-    for (let i = 0; i < sortedPosts.length; i += PAGE_SIZE) {
-      out.push(sortedPosts.slice(i, i + PAGE_SIZE));
+    for (let i = 0; i < sorted.length; i += PAGE_SIZE) {
+      out.push(sorted.slice(i, i + PAGE_SIZE));
     }
     return out;
-  }, [sortedPosts]);
+  }, [posts]);
 
   const totalPages = Math.max(pages.length, 1);
-
-  // Reset to page 0 when sort changes — render-time adjustment pattern.
-  const [lastSort, setLastSort] = useState<SortOrder>(sortBy);
-  if (lastSort !== sortBy) {
-    setLastSort(sortBy);
-    setCurrentPage(0);
-  }
-
   const safePageIndex = Math.min(currentPage, totalPages - 1);
   const currentPagePosts = pages[safePageIndex] ?? [];
 
-  // ESC closes the sort menu.
-  useEffect(() => {
-    if (!sortOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSortOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [sortOpen]);
-
-  // Click outside closes the sort popover.
-  useEffect(() => {
-    if (!sortOpen) return;
-    const onClick = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (sortRef.current && !sortRef.current.contains(t)) {
-        setSortOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [sortOpen]);
-
-  if (error || (!isLoading && posts.length === 0)) {
-    return null;
-  }
-
-  const handlePrevious = () => setCurrentPage((p) => Math.max(0, p - 1));
-  const handleNext = () => setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
+  const failed = error || (!isLoading && posts.length === 0);
 
   return (
-    <section className="w-full mt-6 sm:mt-8">
-      <div className="max-w-[var(--content-max-width)] mx-auto">
-        {/* Heading row: title + sort */}
-        <div className="resource-header">
-          <h2
-            className="font-sans text-xl font-bold"
-            style={{ color: "var(--color-vanilla)", fontFamily: "var(--font-sans)" }}
+    <div className="bin-panel-inner">
+      {failed ? (
+        <p className="text-sm text-[var(--fg-secondary)] py-2">
+          Fresh posts live on{" "}
+          <a
+            href="https://opensession.substack.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--color-aperol)] hover:underline underline-offset-2"
           >
-            Recent Blogs
-          </h2>
-
-          <div className="resource-controls">
-            <div className="resource-control-anchor" ref={sortRef}>
-              <button
-                type="button"
-                className="resource-control-icon-button"
-                onClick={() => setSortOpen((v) => !v)}
-                aria-haspopup="menu"
-                aria-expanded={sortOpen}
-                aria-label={`Sort: ${SORT_LABEL[sortBy]}`}
-                title={`Sort: ${SORT_LABEL[sortBy]}`}
+            our Substack
+          </a>
+          .
+        </p>
+      ) : (
+        <>
+          <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={safePageIndex}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="flex flex-col gap-3"
               >
-                <ArrowUpDown className="resource-control-icon" />
-              </button>
-              <AnimatePresence>
-                {sortOpen && (
-                  <motion.div
-                    role="menu"
-                    className="resource-control-popover right-0"
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.15, ease: "easeOut" }}
-                  >
-                    <span className="resource-control-popover-label">Sort by</span>
-                    {(["recent", "oldest"] as SortOrder[]).map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        role="menuitemradio"
-                        aria-checked={sortBy === opt}
-                        className={`resource-control-popover-item ${sortBy === opt ? "selected" : ""}`}
-                        onClick={() => {
-                          setSortBy(opt);
-                          setSortOpen(false);
-                        }}
-                      >
-                        {SORT_LABEL[opt]}
-                      </button>
-                    ))}
-                  </motion.div>
+                {isLoading ? (
+                  <>
+                    <BlogCardSkeleton />
+                    <BlogCardSkeleton />
+                    <BlogCardSkeleton />
+                  </>
+                ) : (
+                  currentPagePosts.map((post) => <BlogCard key={post.id} post={post} />)
                 )}
-              </AnimatePresence>
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
-        </div>
 
-        {/* Paginated card stack */}
-        <div className="relative overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${safePageIndex}-${sortBy}`}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="flex flex-col gap-3"
-            >
-              {isLoading ? (
-                <>
-                  <BlogCardSkeleton />
-                  <BlogCardSkeleton />
-                  <BlogCardSkeleton />
-                </>
-              ) : (
-                currentPagePosts.map((post) => <BlogCard key={post.id} post={post} />)
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+          {!isLoading && totalPages > 1 && (
+            <div className="resource-pagination">
+              <button
+                className="resource-nav-arrow"
+                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                disabled={safePageIndex === 0}
+                aria-label="Previous blogs"
+              >
+                <ChevronLeftIcon />
+              </button>
 
-        {/* Pagination — only when there's more than one page */}
-        {!isLoading && totalPages > 1 && (
-          <div className="resource-pagination">
-            <button
-              className="resource-nav-arrow"
-              onClick={handlePrevious}
-              disabled={safePageIndex === 0}
-              aria-label="Previous blogs"
-            >
-              <ChevronLeftIcon />
-            </button>
+              <div className="resource-dots">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    className={`resource-pagination-dot ${safePageIndex === i ? "active" : ""}`}
+                    onClick={() => setCurrentPage(i)}
+                    aria-label={`Go to page ${i + 1}`}
+                  />
+                ))}
+              </div>
 
-            <div className="resource-dots">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button
-                  key={i}
-                  className={`resource-pagination-dot ${safePageIndex === i ? "active" : ""}`}
-                  onClick={() => setCurrentPage(i)}
-                  aria-label={`Go to page ${i + 1}`}
-                />
-              ))}
+              <button
+                className="resource-nav-arrow"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={safePageIndex === totalPages - 1}
+                aria-label="Next blogs"
+              >
+                <ChevronRightIcon />
+              </button>
             </div>
+          )}
+        </>
+      )}
 
-            <button
-              className="resource-nav-arrow"
-              onClick={handleNext}
-              disabled={safePageIndex === totalPages - 1}
-              aria-label="Next blogs"
-            >
-              <ChevronRightIcon />
-            </button>
-          </div>
-        )}
-
-        {/* Subscribe form — moved below pagination */}
-        <div className="mt-5 sm:mt-6">
-          <form
-            action="https://opensession.substack.com/api/v1/free?nojs=true"
-            method="post"
-            className="subscribe-form"
-          >
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              required
-              className="subscribe-input"
-            />
-            <button type="submit" className="subscribe-button">
-              Subscribe
-            </button>
-          </form>
-          <p className="subscribe-hint">
-            Get our latest posts delivered to your inbox
-          </p>
-        </div>
+      <div className="mt-5">
+        <form
+          action="https://opensession.substack.com/api/v1/free?nojs=true"
+          method="post"
+          className="subscribe-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+            className="subscribe-input"
+          />
+          <button type="submit" className="subscribe-button">
+            Subscribe
+          </button>
+        </form>
+        <p className="subscribe-hint">Get our latest posts delivered to your inbox</p>
       </div>
-    </section>
+    </div>
   );
 }

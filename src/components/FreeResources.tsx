@@ -1,10 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpDown, ArrowUpRight, Figma, Github } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowUpRight, Figma, Github } from "lucide-react";
 import { SubscribeModal, hasResourceAccess } from "./SubscribeModal";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { assetPath } from "@/lib/assetPath";
 
 function ChevronLeftIcon() {
@@ -41,46 +40,9 @@ function ChevronRightIcon() {
   );
 }
 
-function FilterIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="7" y1="12" x2="17" y2="12" />
-      <line x1="10" y1="18" x2="14" y2="18" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
-
 type ResourceCategory = "creative" | "code";
 type ResourceTool = "figma" | "github";
-type SortOrder = "recent" | "oldest";
+type CategoryFilter = "all" | ResourceCategory;
 
 interface ResourceCard {
   id: string;
@@ -88,6 +50,8 @@ interface ResourceCard {
   mediaDefault: string;
   mediaType: "image" | "video";
   imageHover: string;
+  /** Square-safe still used by the compact mobile row. */
+  thumb: string;
   title: string;
   description: string;
   href: string;
@@ -95,6 +59,8 @@ interface ResourceCard {
   categories: ResourceCategory[];
   tool: ResourceTool;
   dateAdded: string; // ISO YYYY-MM-DD
+  /** Pinned to the top of the list with a "Popular" badge. */
+  featured?: boolean;
 }
 
 const CATEGORY_LABEL: Record<ResourceCategory, string> = {
@@ -127,6 +93,7 @@ const resourceCards: ResourceCard[] = [
     mediaDefault: "/images/portfolio-01.jpg",
     mediaType: "image",
     imageHover: "/images/portfolio-02.jpg",
+    thumb: "/images/portfolio-01.jpg",
     title: "Portfolio Template",
     description:
       "Our co-founder's portfolio that helped him land jobs at Google, Salesforce, and other Fortune 500 companies. Open source and ready to customize",
@@ -142,6 +109,7 @@ const resourceCards: ResourceCard[] = [
     mediaDefault: "/images/design-directory-01.mp4",
     mediaType: "video",
     imageHover: "/images/design-directory-02.jpg",
+    thumb: "/images/design-directory-02.jpg",
     title: "Design Directory",
     description:
       "All of our favorite design tools in one interactive directory. Open-source and ready to adapt for your own creative workflow.",
@@ -157,6 +125,7 @@ const resourceCards: ResourceCard[] = [
     mediaDefault: "/images/brand-design-system-01.jpg",
     mediaType: "image",
     imageHover: "/images/brand-design-system-02.jpg",
+    thumb: "/images/brand-design-system-01.jpg",
     title: "Brand Design System",
     description:
       "Comprehensive design system optimized for brand identity in the AI era. Fully configurable with connected variables and ready to customize.",
@@ -165,6 +134,7 @@ const resourceCards: ResourceCard[] = [
     categories: ["creative"],
     tool: "figma",
     dateAdded: "2026-03-26",
+    featured: true,
   },
   {
     id: "linktree-template",
@@ -172,6 +142,7 @@ const resourceCards: ResourceCard[] = [
     mediaDefault: "/images/linktree-template-01.jpg",
     mediaType: "image",
     imageHover: "/images/linktree-template-02.jpg",
+    thumb: "/images/linktree-template-01.jpg",
     title: "Linktree Template",
     description:
       "A beautiful, customizable link portal template built with Next.js. Open-source and ready to adapt for your own brand.",
@@ -187,6 +158,7 @@ const resourceCards: ResourceCard[] = [
     mediaDefault: "/images/karimo-01.gif",
     mediaType: "image",
     imageHover: "/images/karimo-02.jpg",
+    thumb: "/images/karimo-02.jpg",
     title: "Claude Code Harness",
     description:
       "Karimo is a framework and Claude Code plugin for PRD-driven autonomous development. Think of it as plan mode on steroids.",
@@ -206,6 +178,8 @@ function Badge({ text, variant }: { text: string; variant: "coming-soon" | "live
     </span>
   );
 }
+
+/* ---------- Desktop: visual card ---------- */
 
 function ResourceCardComponent({
   card,
@@ -243,7 +217,6 @@ function ResourceCardComponent({
     >
       {/* Image/Video Area - rounded-t-[11px] to account for 1px border */}
       <div className="relative bg-[#191919] rounded-t-[11px] overflow-hidden h-48">
-        {/* O1 - Default media (image or video) */}
         {card.mediaType === "video" ? (
           <motion.video
             src={assetPath(card.mediaDefault)}
@@ -271,7 +244,6 @@ function ResourceCardComponent({
           />
         )}
 
-        {/* O2 - Hover image with crossfade + subtle scale */}
         <motion.img
           src={assetPath(card.imageHover)}
           alt=""
@@ -284,13 +256,11 @@ function ResourceCardComponent({
           transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
         />
 
-        {/* Badge - Top Right */}
         <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
           <Badge text={card.badge.text} variant={card.badge.variant} />
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="resource-card-content flex flex-col flex-grow">
         <div className="resource-card-title-row">
           <h3 className="resource-card-title font-accent font-bold text-[var(--color-vanilla)]">
@@ -325,8 +295,7 @@ function ResourceCardComponent({
   );
 }
 
-// Mobile pagination component
-function MobilePagination({
+function CarouselPagination({
   currentPage,
   totalPages,
   onPrevious,
@@ -373,7 +342,6 @@ function MobilePagination({
   );
 }
 
-// Group cards into pages of `size` (2 on tablet/mobile, 3 on desktop)
 function getCardPages(cards: ResourceCard[], size: number): ResourceCard[][] {
   const pages: ResourceCard[][] = [];
   for (let i = 0; i < cards.length; i += size) {
@@ -382,42 +350,83 @@ function getCardPages(cards: ResourceCard[], size: number): ResourceCard[][] {
   return pages;
 }
 
-const SORT_LABEL: Record<SortOrder, string> = {
-  recent: "Recently added",
-  oldest: "Oldest first",
-};
+/* ---------- Mobile: compact row ---------- */
 
-type CategoryFilter = "all" | ResourceCategory;
-type ToolFilter = "all" | ResourceTool;
+function ResourceRow({
+  card,
+  onClick,
+}: {
+  card: ResourceCard;
+  onClick: (card: ResourceCard) => void;
+}) {
+  const meta = [
+    card.categories.map((c) => CATEGORY_LABEL[c]).join(" + "),
+    card.buttonLabel,
+    formatDateAdded(card.dateAdded),
+  ].join(" · ");
 
-type FilterPillVariant = "category" | "tool";
+  return (
+    <motion.li
+      layout
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+    >
+      <button type="button" className="resource-row" onClick={() => onClick(card)}>
+        <img
+          src={assetPath(card.thumb)}
+          alt=""
+          className="resource-row-thumb"
+          loading="lazy"
+          draggable={false}
+        />
+        <span className="resource-row-body">
+          <span className="resource-row-title">{card.title}</span>
+          <span className="resource-row-meta">{meta}</span>
+        </span>
+        {card.featured && <span className="resource-row-badge">Popular</span>}
+        <ArrowUpRight className="resource-row-arrow" aria-hidden="true" />
+      </button>
+    </motion.li>
+  );
+}
 
-function FilterPills<T extends string>({
-  options,
+/* ---------- Category chips ---------- */
+
+const CHIP_OPTIONS: { value: CategoryFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "creative", label: "Creative" },
+  { value: "code", label: "Code" },
+];
+
+function ResourceChips({
   value,
   onChange,
-  variant,
 }: {
-  options: { value: T; label: string; icon?: React.ComponentType<{ className?: string }> }[];
-  value: T;
-  onChange: (next: T) => void;
-  variant: FilterPillVariant;
+  value: CategoryFilter;
+  onChange: (next: CategoryFilter) => void;
 }) {
   return (
-    <div className="resource-filter-pills">
-      {options.map((opt) => {
+    <div className="resource-chips" aria-label="Filter resources by category">
+      {CHIP_OPTIONS.map((opt) => {
         const selected = opt.value === value;
-        const Icon = opt.icon;
         return (
           <button
             key={opt.value}
             type="button"
-            className={`resource-filter-pill resource-filter-pill--${variant} ${selected ? "selected" : ""}`}
-            onClick={() => onChange(opt.value)}
+            className={`resource-chip ${selected ? "selected" : ""}`}
             aria-pressed={selected}
+            onClick={() => onChange(opt.value)}
           >
-            {Icon && <Icon className="resource-filter-pill-icon" />}
-            {opt.label}
+            {selected && (
+              <motion.span
+                layoutId="resource-chip-active"
+                className="resource-chip-bg"
+                transition={{ type: "spring", stiffness: 420, damping: 34 }}
+              />
+            )}
+            <span className="resource-chip-label">{opt.label}</span>
           </button>
         );
       })}
@@ -425,96 +434,47 @@ function FilterPills<T extends string>({
   );
 }
 
-export function FreeResources() {
+/* ---------- Panel ---------- */
+
+const CARDS_PER_PAGE = 3;
+
+/**
+ * Body of the Free Resources bin. Renders compact rows below `lg` and the
+ * visual card carousel at `lg+` — both are in the DOM and toggled with CSS
+ * so there's no layout flash on hydration.
+ */
+export function FreeResourcesPanel() {
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     card: ResourceCard | null;
   }>({ isOpen: false, card: null });
 
+  const [category, setCategory] = useState<CategoryFilter>("all");
   const [currentPage, setCurrentPage] = useState(0);
-  const [sortBy, setSortBy] = useState<SortOrder>("recent");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
-  const [toolFilter, setToolFilter] = useState<ToolFilter>("all");
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
-
-  // Reset to page 0 when filter/sort changes — render-time adjustment pattern.
-  const filterSignature = `${categoryFilter}|${toolFilter}|${sortBy}`;
-  const [lastFilterSignature, setLastFilterSignature] = useState(filterSignature);
-  if (lastFilterSignature !== filterSignature) {
-    setLastFilterSignature(filterSignature);
-    setCurrentPage(0);
-  }
-
-  const isMobile = useMediaQuery("(max-width: 767px)");
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
-
-  const sortRef = useRef<HTMLDivElement | null>(null);
-  const filterRef = useRef<HTMLDivElement | null>(null);
 
   const visibleResources = useMemo(() => {
-    const filtered = resourceCards.filter((r) => {
-      if (categoryFilter !== "all" && !r.categories.includes(categoryFilter)) return false;
-      if (toolFilter !== "all" && r.tool !== toolFilter) return false;
-      return true;
-    });
-    return [...filtered].sort((a, b) =>
-      sortBy === "recent"
-        ? b.dateAdded.localeCompare(a.dateAdded)
-        : a.dateAdded.localeCompare(b.dateAdded)
+    const filtered = resourceCards.filter(
+      (r) => category === "all" || r.categories.includes(category)
     );
-  }, [categoryFilter, toolFilter, sortBy]);
+    // Featured first, then newest.
+    return [...filtered].sort((a, b) => {
+      if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
+      return b.dateAdded.localeCompare(a.dateAdded);
+    });
+  }, [category]);
 
-  const activeFilterCount =
-    (categoryFilter !== "all" ? 1 : 0) + (toolFilter !== "all" ? 1 : 0);
-
-  const cardsPerPage = isDesktop ? 3 : 2;
   const cardPages = useMemo(
-    () => getCardPages(visibleResources, cardsPerPage),
-    [visibleResources, cardsPerPage]
+    () => getCardPages(visibleResources, CARDS_PER_PAGE),
+    [visibleResources]
   );
   const totalPages = Math.max(cardPages.length, 1);
+  const safePageIndex = Math.min(currentPage, totalPages - 1);
+  const currentPageCards = cardPages[safePageIndex] ?? [];
 
-  // Lock body scroll while the mobile filter sheet is open.
-  useEffect(() => {
-    if (filterOpen && isMobile) {
-      const original = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = original;
-      };
-    }
-  }, [filterOpen, isMobile]);
-
-  // ESC closes any open menu.
-  useEffect(() => {
-    if (!sortOpen && !filterOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSortOpen(false);
-        setFilterOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [sortOpen, filterOpen]);
-
-  // Click outside closes the desktop popovers (sort + filter).
-  useEffect(() => {
-    if (isMobile) return;
-    if (!sortOpen && !filterOpen) return;
-    const onClick = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (sortOpen && sortRef.current && !sortRef.current.contains(t)) {
-        setSortOpen(false);
-      }
-      if (filterOpen && filterRef.current && !filterRef.current.contains(t)) {
-        setFilterOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [sortOpen, filterOpen, isMobile]);
+  const handleCategoryChange = (next: CategoryFilter) => {
+    setCategory(next);
+    setCurrentPage(0);
+  };
 
   const handleCardClick = (card: ResourceCard) => {
     if (hasResourceAccess()) {
@@ -528,266 +488,54 @@ export function FreeResources() {
     setModalState({ isOpen: false, card: null });
   };
 
-  const handlePrevious = () => {
-    setCurrentPage((prev) => Math.max(0, prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
-  };
-
-  const handleDotClick = (index: number) => {
-    setCurrentPage(index);
-  };
-
-  const clearFilters = () => {
-    setCategoryFilter("all");
-    setToolFilter("all");
-  };
-
-  const isEmpty = visibleResources.length === 0;
-  const safePageIndex = Math.min(currentPage, totalPages - 1);
-  const currentPageCards = cardPages[safePageIndex] ?? [];
-
-  const filterPanelBody = (
-    <>
-      <div className="resource-filter-section">
-        <span className="resource-filter-label">Category</span>
-        <FilterPills<CategoryFilter>
-          variant="category"
-          value={categoryFilter}
-          onChange={setCategoryFilter}
-          options={[
-            { value: "all", label: "All" },
-            { value: "creative", label: "Creative" },
-            { value: "code", label: "Code" },
-          ]}
-        />
-      </div>
-      <div className="resource-filter-section">
-        <span className="resource-filter-label">Tool</span>
-        <FilterPills<ToolFilter>
-          variant="tool"
-          value={toolFilter}
-          onChange={setToolFilter}
-          options={[
-            { value: "all", label: "All" },
-            { value: "figma", label: "Figma", icon: Figma },
-            { value: "github", label: "GitHub", icon: Github },
-          ]}
-        />
-      </div>
-      <div className="resource-filter-footer">
-        <button
-          type="button"
-          className="resource-filter-clear"
-          onClick={clearFilters}
-          disabled={activeFilterCount === 0}
-        >
-          Clear
-        </button>
-      </div>
-    </>
-  );
-
   return (
     <>
-      <section className="w-full mt-7 sm:mt-9">
-        <div className="max-w-[var(--content-max-width)] mx-auto">
-          {/* Heading row: title left, sort + filter controls right */}
-          <div className="resource-header">
-            <h2
-              className="font-sans text-xl font-bold"
-              style={{ color: "var(--color-vanilla)", fontFamily: "var(--font-sans)" }}
+      <ResourceChips value={category} onChange={handleCategoryChange} />
+
+      {/* Mobile / tablet: compact list — every resource visible at once */}
+      <ul className="resource-rows lg:hidden">
+        <AnimatePresence initial={false}>
+          {visibleResources.map((card) => (
+            <ResourceRow key={card.id} card={card} onClick={handleCardClick} />
+          ))}
+        </AnimatePresence>
+      </ul>
+
+      {/* Desktop: visual card carousel, 3 per page */}
+      <div className="hidden lg:block px-[10px] pb-[10px]">
+        <div
+          className={`resource-carousel-wrapper ${cardPages.length > 1 ? "resource-carousel-wrapper--multi" : ""}`}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${safePageIndex}-${category}`}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="resource-card-page"
             >
-              Free Resources
-            </h2>
+              {currentPageCards.map((card) => (
+                <ResourceCardComponent
+                  key={card.id}
+                  card={card}
+                  onCardClick={handleCardClick}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
 
-            <div className="resource-controls">
-              <div className="resource-control-anchor" ref={sortRef}>
-                <button
-                  type="button"
-                  className="resource-control-icon-button"
-                  onClick={() => {
-                    setSortOpen((v) => !v);
-                    setFilterOpen(false);
-                  }}
-                  aria-haspopup="menu"
-                  aria-expanded={sortOpen}
-                  aria-label={`Sort: ${SORT_LABEL[sortBy]}`}
-                  title={`Sort: ${SORT_LABEL[sortBy]}`}
-                >
-                  <ArrowUpDown className="resource-control-icon" />
-                </button>
-                <AnimatePresence>
-                  {sortOpen && (
-                    <motion.div
-                      role="menu"
-                      className="resource-control-popover right-0"
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                    >
-                      <span className="resource-control-popover-label">Sort by</span>
-                      {(["recent", "oldest"] as SortOrder[]).map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          role="menuitemradio"
-                          aria-checked={sortBy === opt}
-                          className={`resource-control-popover-item ${sortBy === opt ? "selected" : ""}`}
-                          onClick={() => {
-                            setSortBy(opt);
-                            setSortOpen(false);
-                          }}
-                        >
-                          {SORT_LABEL[opt]}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <div className="resource-control-anchor" ref={filterRef}>
-                <button
-                  type="button"
-                  className={`resource-control-chip ${activeFilterCount > 0 ? "active" : ""} ${filterOpen ? "open" : ""}`}
-                  onClick={() => {
-                    setFilterOpen((v) => !v);
-                    setSortOpen(false);
-                  }}
-                  aria-haspopup={isMobile ? "dialog" : "true"}
-                  aria-expanded={filterOpen}
-                >
-                  <FilterIcon />
-                  <span>
-                    Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
-                  </span>
-                </button>
-
-                {/* Desktop: filter popover anchored to the button */}
-                {!isMobile && (
-                  <AnimatePresence>
-                    {filterOpen && (
-                      <motion.div
-                        role="dialog"
-                        aria-label="Filter resources"
-                        className="resource-control-popover resource-filter-popover right-0"
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                      >
-                        {filterPanelBody}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile bottom sheet */}
-          {isMobile && (
-            <AnimatePresence>
-              {filterOpen && (
-                <>
-                  <motion.div
-                    className="resource-filter-backdrop"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    onClick={() => setFilterOpen(false)}
-                  />
-                  <motion.div
-                    role="dialog"
-                    aria-label="Filter resources"
-                    className="resource-filter-sheet"
-                    initial={{ y: "100%" }}
-                    animate={{ y: 0 }}
-                    exit={{ y: "100%" }}
-                    transition={{ type: "spring", damping: 32, stiffness: 320 }}
-                  >
-                    <div className="resource-filter-sheet-header">
-                      <span className="resource-filter-sheet-title">Filter</span>
-                      <button
-                        type="button"
-                        className="resource-filter-sheet-close"
-                        onClick={() => setFilterOpen(false)}
-                        aria-label="Close filter"
-                      >
-                        <CloseIcon />
-                      </button>
-                    </div>
-                    {filterPanelBody}
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-          )}
-
-          {/* Card carousel — 2 cards per page on every viewport */}
-          {isEmpty ? (
-            <div className="resource-empty-state">
-              <p className="resource-empty-state-text">
-                No resources match these filters.
-              </p>
-              <button
-                type="button"
-                className="resource-empty-state-clear"
-                onClick={clearFilters}
-              >
-                Clear filters
-              </button>
-            </div>
-          ) : (
-            <div
-              className={`resource-carousel-wrapper ${cardPages.length > 1 ? "resource-carousel-wrapper--multi" : ""}`}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`${safePageIndex}-${categoryFilter}-${toolFilter}-${sortBy}`}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  drag={isMobile && cardPages.length > 1 ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onDragEnd={(_, info) => {
-                    const swipeThreshold = 50;
-                    if (info.offset.x < -swipeThreshold && safePageIndex < totalPages - 1) {
-                      setCurrentPage(safePageIndex + 1);
-                    } else if (info.offset.x > swipeThreshold && safePageIndex > 0) {
-                      setCurrentPage(safePageIndex - 1);
-                    }
-                  }}
-                  className="resource-card-page"
-                >
-                  {currentPageCards.map((card) => (
-                    <ResourceCardComponent
-                      key={card.id}
-                      card={card}
-                      onCardClick={handleCardClick}
-                    />
-                  ))}
-                </motion.div>
-              </AnimatePresence>
-
-              <MobilePagination
-                currentPage={safePageIndex}
-                totalPages={totalPages}
-                onPrevious={handlePrevious}
-                onNext={handleNext}
-                onDotClick={handleDotClick}
-              />
-            </div>
+          {totalPages > 1 && (
+            <CarouselPagination
+              currentPage={safePageIndex}
+              totalPages={totalPages}
+              onPrevious={() => setCurrentPage((p) => Math.max(0, p - 1))}
+              onNext={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+              onDotClick={setCurrentPage}
+            />
           )}
         </div>
-      </section>
+      </div>
 
       <SubscribeModal
         isOpen={modalState.isOpen}
