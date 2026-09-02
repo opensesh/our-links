@@ -9,7 +9,7 @@ interface BinProps {
   children: ReactNode;
   /** Free Resources ships open on every viewport. */
   defaultOpen?: boolean;
-  /** `primary` = aperol fill (the conversion bin); `default` = vanilla. */
+  /** `primary` = aperol fill while open (the conversion bin); closed bins are all vanilla. */
   variant?: "primary" | "default";
   /** Position in the stack — drives the page-load stagger. */
   index?: number;
@@ -51,7 +51,7 @@ export function Bin({
     >
       <button
         type="button"
-        className={`bin-header ${variant === "primary" ? "bin-header--primary" : ""}`}
+        className={`bin-header ${variant === "primary" && open ? "bin-header--primary" : ""}`}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => {

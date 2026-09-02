@@ -297,13 +297,18 @@ function Pagination({
   totalPages: number;
   onChange: (page: number) => void;
 }) {
+  const single = totalPages <= 1;
   return (
-    <div className="resource-pagination resource-toolbar-pagination">
+    <div
+      className="resource-pagination resource-toolbar-pagination"
+      data-disabled={single}
+      aria-disabled={single}
+    >
       <button
         type="button"
         className="resource-nav-arrow"
         onClick={() => onChange(Math.max(0, currentPage - 1))}
-        disabled={currentPage === 0}
+        disabled={single || currentPage === 0}
         aria-label="Previous resources"
       >
         <ChevronLeftIcon />
@@ -316,6 +321,7 @@ function Pagination({
             type="button"
             className={`resource-pagination-dot ${currentPage === index ? "active" : ""}`}
             onClick={() => onChange(index)}
+            disabled={single}
             aria-label={`Go to page ${index + 1}`}
           />
         ))}
@@ -325,7 +331,7 @@ function Pagination({
         type="button"
         className="resource-nav-arrow"
         onClick={() => onChange(Math.min(totalPages - 1, currentPage + 1))}
-        disabled={currentPage === totalPages - 1}
+        disabled={single || currentPage === totalPages - 1}
         aria-label="Next resources"
       >
         <ChevronRightIcon />
@@ -383,9 +389,7 @@ export function FreeResourcesPanel() {
     <>
       <div className="resource-toolbar">
         <ResourceChips value={category} onChange={handleCategoryChange} />
-        {totalPages > 1 && (
-          <Pagination currentPage={safePage} totalPages={totalPages} onChange={setPage} />
-        )}
+        <Pagination currentPage={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
       <div className="bin-panel">
