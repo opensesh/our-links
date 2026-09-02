@@ -1623,31 +1623,42 @@ button,
   transform: translateY(0) scale(0.995);
 }
 
-/* Open state — the same aperol tint for every bin */
+/* Open state — the glass simply catches more light. Monochrome by design:
+   the tint, rim light and drop shadow all stay vanilla so an open bin reads
+   as lit rather than branded. Sits one step above :hover so the open+hover
+   state still has somewhere to go. */
 .bin-header[aria-expanded="true"] {
-  border-color: rgba(254, 97, 25, 0.5);
+  border-color: rgba(255, 250, 238, 0.3);
   background: linear-gradient(
     180deg,
-    rgba(254, 81, 2, 0.36) 0%,
-    rgba(254, 81, 2, 0.2) 55%,
-    rgba(254, 81, 2, 0.14) 100%
+    rgba(255, 250, 238, 0.18) 0%,
+    rgba(255, 250, 238, 0.09) 55%,
+    rgba(255, 250, 238, 0.05) 100%
   );
   box-shadow:
-    inset 0 1px 0 rgba(255, 220, 200, 0.4),
+    inset 0 1px 0 rgba(255, 250, 238, 0.48),
     inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-    inset 0 0 22px rgba(254, 81, 2, 0.12),
-    0 12px 32px rgba(254, 81, 2, 0.14),
+    inset 0 0 22px rgba(255, 250, 238, 0.09),
+    0 12px 32px rgba(0, 0, 0, 0.4),
     0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+/* box-shadow is restated because .bin-header:hover ties on specificity —
+   without it the lift would depend on source order alone. */
 .bin-header[aria-expanded="true"]:hover {
-  border-color: rgba(254, 97, 25, 0.65);
+  border-color: rgba(255, 250, 238, 0.38);
   background: linear-gradient(
     180deg,
-    rgba(254, 81, 2, 0.44) 0%,
-    rgba(254, 81, 2, 0.26) 55%,
-    rgba(254, 81, 2, 0.18) 100%
+    rgba(255, 250, 238, 0.22) 0%,
+    rgba(255, 250, 238, 0.12) 55%,
+    rgba(255, 250, 238, 0.07) 100%
   );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 238, 0.56),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    inset 0 0 26px rgba(255, 250, 238, 0.11),
+    0 16px 36px rgba(0, 0, 0, 0.44),
+    0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes bin-shimmer {
