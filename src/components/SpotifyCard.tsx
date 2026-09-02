@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Pause, Play } from "lucide-react";
 import { assetPath } from "@/lib/assetPath";
 import {
   loadSpotifyIframeApi,
@@ -10,13 +10,12 @@ import {
 
 const PLAYLIST_ID = "6womgBeE0Ag3dnfKZX31eM";
 const PLAYLIST_URI = `spotify:playlist:${PLAYLIST_ID}`;
-const PLAYLIST_URL = `https://open.spotify.com/playlist/${PLAYLIST_ID}`;
 const EMBED_URL = `https://open.spotify.com/embed/playlist/${PLAYLIST_ID}?utm_source=generator&theme=0`;
 const EMBED_HEIGHT = 152;
 /** If the iframe API never reports ready, fall back to a plain embed. */
 const READY_TIMEOUT_MS = 10000;
 
-type Status = "idle" | "loading" | "ready" | "fallback";
+type Status = "loading" | "ready" | "fallback";
 
 function Equalizer() {
   return (
@@ -29,92 +28,91 @@ function Equalizer() {
 }
 
 /**
- * "Office Jams" — the studio playlist, above the fold.
+ * "Office Jams" — the studio playlist.
  *
- * Nothing from Spotify loads until the first tap on play. That tap injects
- * the Embed iFrame API, mounts the player, and (on pointer devices) starts
- * playback; from then on
- * the aperol button and the vinyl toggle the same controller, and the record
- * spins (with an aperol glow) only while audio is actually playing.
+ * The Spotify player mounts on its own once the page is idle (so it never
+ * competes with the hero for first paint) and shows the full playlist. Our
+ * vinyl + aperol button drive the same controller: the record spins with an
+ * aperol glow only while audio is actually playing.
  */
 export function SpotifyCard() {
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<Status>("loading");
   const [playing, setPlaying] = useState(false);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
-  const readyTimerRef = useRef<number | null>(null);
-
-  const clearReadyTimer = () => {
-    if (readyTimerRef.current !== null) {
-      window.clearTimeout(readyTimerRef.current);
-      readyTimerRef.current = null;
-    }
-  };
-
-  const initPlayer = useCallback(async () => {
-    const host = hostRef.current;
-    if (!host) return;
-    setStatus("loading");
-
-    readyTimerRef.current = window.setTimeout(() => {
-      setStatus((s) => (s === "loading" ? "fallback" : s));
-    }, READY_TIMEOUT_MS);
-
-    // Programmatic play on touch devices trips Spotify's "Get Spotify"
-    // interstitial for signed-out listeners, so there we only mount the
-    // player and let its own play button start audio.
-    const autoplay = !window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-
-    try {
-      const api = await loadSpotifyIframeApi();
-      // The API replaces the element we hand it with an <iframe>, so give it a
-      // node React doesn't own.
-      const mount = document.createElement("div");
-      host.replaceChildren(mount);
-
-      api.createController(
-        mount,
-        { uri: PLAYLIST_URI, width: "100%", height: EMBED_HEIGHT, theme: "dark" },
-        (controller) => {
-          controllerRef.current = controller;
-          controller.addListener("ready", () => {
-            clearReadyTimer();
-            setStatus("ready");
-            if (autoplay) controller.play();
-          });
-          controller.addListener("playback_update", (e) => {
-            clearReadyTimer();
-            setStatus((s) => (s === "ready" ? s : "ready"));
-            setPlaying(!e.data.isPaused);
-          });
-        }
-      );
-    } catch {
-      clearReadyTimer();
-      setStatus("fallback");
-    }
-  }, []);
-
-  const handlePlay = () => {
-    if (status === "idle") {
-      void initPlayer();
-      return;
-    }
-    if (status === "ready" && controllerRef.current) {
-      controllerRef.current.togglePlay();
-    }
-    // "loading": wait. "fallback": the plain embed has its own controls.
-  };
 
   useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    let cancelled = false;
+    let readyTimer: number | null = null;
+
+    const clearReadyTimer = () => {
+      if (readyTimer !== null) {
+        window.clearTimeout(readyTimer);
+        readyTimer = null;
+      }
+    };
+
+    const init = async () => {
+      readyTimer = window.setTimeout(() => {
+        if (!cancelled) setStatus((s) => (s === "loading" ? "fallback" : s));
+      }, READY_TIMEOUT_MS);
+
+      try {
+        const api = await loadSpotifyIframeApi();
+        if (cancelled) return;
+        // The API replaces the element we hand it with an <iframe>, so give it
+        // a node React doesn't own.
+        const mount = document.createElement("div");
+        host.replaceChildren(mount);
+
+        api.createController(
+          mount,
+          { uri: PLAYLIST_URI, width: "100%", height: EMBED_HEIGHT, theme: "dark" },
+          (controller) => {
+            controllerRef.current = controller;
+            controller.addListener("ready", () => {
+              clearReadyTimer();
+              if (!cancelled) setStatus("ready");
+            });
+            controller.addListener("playback_update", (e) => {
+              clearReadyTimer();
+              if (cancelled) return;
+              setStatus("ready");
+              setPlaying(!e.data.isPaused);
+            });
+          }
+        );
+      } catch {
+        clearReadyTimer();
+        if (!cancelled) setStatus("fallback");
+      }
+    };
+
+    // Defer until the browser is idle so the hero paints first.
+    const hasIdle = typeof window.requestIdleCallback === "function";
+    const handle = hasIdle
+      ? window.requestIdleCallback(() => void init(), { timeout: 1500 })
+      : window.setTimeout(() => void init(), 600);
+
     return () => {
+      cancelled = true;
       clearReadyTimer();
+      if (hasIdle) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
       controllerRef.current?.destroy();
       controllerRef.current = null;
     };
   }, []);
 
+  const handleToggle = () => {
+    if (status === "ready") controllerRef.current?.togglePlay();
+  };
+
   const playLabel = playing ? "Pause Open Session Radio" : "Play Open Session Radio";
+  const canToggle = status === "ready";
 
   return (
     <section className="w-full" aria-labelledby="office-jams-heading">
@@ -128,7 +126,8 @@ export function SpotifyCard() {
             type="button"
             className="vinyl-button"
             data-playing={playing}
-            onClick={handlePlay}
+            onClick={handleToggle}
+            disabled={!canToggle}
             aria-label={playLabel}
           >
             <span className="vinyl-glow" aria-hidden="true" />
@@ -151,14 +150,16 @@ export function SpotifyCard() {
                 "On rotation"
               )}
             </span>
-            <h3 className="spotify-title">Open Session Radio</h3>
+            {/* The embed carries the playlist name; keep it for assistive tech only. */}
+            <h3 className="sr-only">Open Session Radio</h3>
             <p className="spotify-sub">The playlist we build to. A taste of our vibe.</p>
           </div>
 
           <button
             type="button"
             className="spotify-play"
-            onClick={handlePlay}
+            onClick={handleToggle}
+            disabled={!canToggle}
             aria-label={playLabel}
             aria-pressed={playing}
           >
@@ -175,6 +176,8 @@ export function SpotifyCard() {
         <div className="spotify-embed" data-status={status}>
           <div ref={hostRef} className="spotify-embed-host" />
 
+          {status === "loading" && <div className="spotify-embed-skeleton" aria-hidden="true" />}
+
           {status === "fallback" && (
             <iframe
               title="Open Session Radio on Spotify"
@@ -183,23 +186,6 @@ export function SpotifyCard() {
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"
             />
-          )}
-
-          {(status === "idle" || status === "loading") && (
-            <div className="spotify-embed-placeholder">
-              <button type="button" className="spotify-embed-cta" onClick={handlePlay}>
-                {status === "loading" ? "Loading the player…" : "Tap play to load the player"}
-              </button>
-              <a
-                href={PLAYLIST_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="spotify-open-link"
-              >
-                Open in Spotify
-                <ArrowUpRight size={12} aria-hidden="true" />
-              </a>
-            </div>
           )}
         </div>
       </div>
