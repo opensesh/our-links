@@ -1083,8 +1083,9 @@ button,
 .subscribe-input {
   flex: 1;
   min-width: 0;
-  padding: 13px 16px;
-  font-size: 15px;
+  height: 40px;
+  padding: 0 14px;
+  font-size: 14px;
   font-family: inherit;
   background: rgba(255, 250, 238, 0.06);
   border: 1px solid rgba(255, 250, 238, 0.2);
@@ -1105,10 +1106,13 @@ button,
 
 /* Subscribe button — the one solid aperol action inside the shelf */
 .subscribe-button {
-  padding: 13px 22px;
+  height: 40px;
+  padding: 0 24px;
   font-size: 14px;
   font-weight: 500;
   font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0;
   background: var(--color-aperol);
   color: var(--color-vanilla);
   border: 1px solid transparent;
