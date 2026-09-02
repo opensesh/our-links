@@ -25,7 +25,7 @@ export function PortalBins() {
       <Bin label="Our Blogs" index={1}>
         <BlogsPanel />
       </Bin>
-      <Bin label="Social Links" index={2}>
+      <Bin label="Links" index={2}>
         <SocialLinksPanel />
       </Bin>
     </div>
