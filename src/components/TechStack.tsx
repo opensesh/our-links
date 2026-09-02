@@ -154,7 +154,7 @@ const techStack: TechItem[] = [
     icon: "/icons/tech/command/bos.svg",
     url: "https://opensession.co",
     description:
-      "Our internal brand operating system. Every asset, token, and guideline lives here, and it becomes a public product soon.",
+      "Our internal brand operating system. Becoming a public product soon...",
     tags: [
       { label: "Design", bg: CATEGORY_COLORS.Design, text: "#fffaee" },
       { label: "Brand System", ...COMMON_TAG_STYLES },
@@ -447,10 +447,10 @@ export function TechStack() {
             onKeyDown={handleKeyDown}
           >
             {/* Icons Scroll Area - fixed height to prevent jolt during transitions */}
-            <div style={{ background: "#4a4a4a", height: 116 }}>
+            <div style={{ background: "#4a4a4a", height: 132 }}>
               <div
                 ref={scrollContainerRef}
-                className="flex items-center gap-4 py-2 overflow-x-auto w-full h-full [&::-webkit-scrollbar]:hidden"
+                className="flex items-center gap-4 py-4 overflow-x-auto w-full h-full [&::-webkit-scrollbar]:hidden"
                 style={{
                   scrollbarWidth: "none",
                   msOverflowStyle: "none",

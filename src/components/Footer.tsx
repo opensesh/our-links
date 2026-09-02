@@ -9,8 +9,6 @@ export function Footer() {
           {/* Left column - Tagline & Email */}
           <div className="flex flex-col gap-6">
             <p className="text-[var(--color-vanilla)]/70 text-sm font-medium leading-relaxed">
-              Transform your brand. Leverage AI.
-              <br />
               Bring bold ideas to life.{" "}
               <a
                 href="https://opensession.co"
