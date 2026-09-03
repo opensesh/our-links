@@ -206,13 +206,12 @@ interface OgMeta {
 // faster, so we fetch them as the source of truth.
 async function fetchOgMeta(postUrl: string): Promise<OgMeta> {
   try {
-    const response = await fetch(postUrl, {
-      headers: FETCH_HEADERS,
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!response.ok) return { image: null, description: null };
-
-    const html = await response.text();
+    const html = await fetchWithFallback(
+      postUrl,
+      (text) => text.includes("<meta"),
+      "og"
+    );
+    if (!html) return { image: null, description: null };
 
     const ogImageMatch =
       html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
@@ -239,44 +238,65 @@ async function fetchOgMeta(postUrl: string): Promise<OgMeta> {
   }
 }
 
-async function fetchRss(): Promise<string | null> {
-  // Try direct fetch first
+/**
+ * Substack answers 403 to datacentre IPs, so CI never gets a direct response.
+ * Try direct first — it is the fast path on a normal network — then fall back
+ * to the CORS proxies. Every Substack request goes through here; a request that
+ * only tries direct will silently return nothing on the GitHub Actions runner.
+ */
+async function fetchWithFallback(
+  url: string,
+  isValid: (text: string) => boolean,
+  label: string
+): Promise<string | null> {
   try {
-    console.log("Attempting direct fetch from Substack...");
-    const response = await fetch(RSS_URL, { headers: FETCH_HEADERS });
+    const response = await fetch(url, {
+      headers: FETCH_HEADERS,
+      signal: AbortSignal.timeout(10000),
+    });
     if (response.ok) {
-      return await response.text();
+      const text = await response.text();
+      if (isValid(text)) return text;
+      console.log(`  ${label}: direct fetch returned unusable content, trying proxies`);
+    } else {
+      console.log(
+        `  ${label}: direct fetch failed (${response.status} ${response.statusText}), trying proxies`
+      );
     }
-    console.log(`Direct fetch failed: ${response.status} ${response.statusText}`);
   } catch (err) {
-    console.log(`Direct fetch error: ${err}`);
+    console.log(`  ${label}: direct fetch error (${err}), trying proxies`);
   }
 
-  // Try with a CORS proxy (works in Node.js too)
   const proxies = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(RSS_URL)}`,
-    `https://corsproxy.io/?${encodeURIComponent(RSS_URL)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://corsproxy.io/?${encodeURIComponent(url)}`,
   ];
 
   for (const proxyUrl of proxies) {
     try {
-      console.log(`Trying proxy: ${proxyUrl.split("?")[0]}...`);
       const response = await fetch(proxyUrl, {
         headers: FETCH_HEADERS,
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(15000),
       });
       if (response.ok) {
         const text = await response.text();
-        if (text.includes("<rss") || text.includes("<?xml")) {
-          return text;
-        }
+        if (isValid(text)) return text;
       }
     } catch (err) {
-      console.log(`Proxy failed: ${err}`);
+      console.log(`  ${label}: proxy ${proxyUrl.split("?")[0]} failed (${err})`);
     }
   }
 
   return null;
+}
+
+async function fetchRss(): Promise<string | null> {
+  console.log("Attempting direct fetch from Substack...");
+  return fetchWithFallback(
+    RSS_URL,
+    (text) => text.includes("<rss") || text.includes("<?xml"),
+    "RSS"
+  );
 }
 
 async function main() {
@@ -304,10 +324,27 @@ async function main() {
   const posts = parseRssXml(xmlText);
   console.log(`Parsed ${posts.length} blog posts`);
 
+  // Last good values, keyed by post URL. A thumbnail we already have on disk is
+  // better than the "OS" placeholder, so an upstream block degrades to stale
+  // rather than blank.
+  const cached = new Map<string, BlogPost>();
+  if (existsSync(OUTPUT_FILE)) {
+    try {
+      const previous = JSON.parse(readFileSync(OUTPUT_FILE, "utf-8")) as BlogPost[];
+      for (const post of previous) cached.set(post.link, post);
+    } catch {
+      console.log("Existing blogs.json could not be parsed; continuing without it");
+    }
+  }
+
   // Pull the live post page's og:image and og:description. The author-curated
   // og:image is preferred over content-extracted images, and og:description
   // updates faster than the RSS <description> field (which is cached upstream).
-  for (const post of posts) {
+  // Spaced out because the CORS proxies rate-limit a rapid burst, and a
+  // throttled proxy looks exactly like a post with no image.
+  for (let index = 0; index < posts.length; index++) {
+    const post = posts[index];
+    if (index > 0) await new Promise((resolve) => setTimeout(resolve, 1200));
     console.log(`Fetching og meta for: ${post.title.slice(0, 40)}...`);
     const og = await fetchOgMeta(post.link);
     if (og.image) {
@@ -316,6 +353,20 @@ async function main() {
     if (og.description) {
       post.description = og.description;
     }
+
+    if (!post.imageUrl) {
+      const previousImage = cached.get(post.link)?.imageUrl;
+      if (previousImage) {
+        post.imageUrl = previousImage;
+        console.log(`  no image found upstream — kept the cached thumbnail`);
+      }
+    }
+  }
+
+  const missing = posts.filter((post) => !post.imageUrl);
+  if (missing.length > 0) {
+    console.log(`\nWARNING: ${missing.length}/${posts.length} posts have no thumbnail:`);
+    missing.forEach((post) => console.log(`  - ${post.title}`));
   }
 
   // Ensure output directory exists
