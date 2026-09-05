@@ -16,7 +16,6 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="font-accent text-xs uppercase tracking-widest text-[var(--fg-brand-aperol)] mb-3 sm:mb-4"
           >
-            A modern design company.
           </motion.p>
 
           <TextBlockReveal

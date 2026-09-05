@@ -15,7 +15,7 @@ export function SpotifyCard() {
 
   return (
     <section className="w-full" aria-labelledby="office-jams-heading">
-      <h2 id="office-jams-heading" className="section-label mb-2">
+      <h2 id="office-jams-heading" className="section-title mb-2">
         Office Jams
       </h2>
 

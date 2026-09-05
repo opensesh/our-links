@@ -431,7 +431,7 @@ export function TechStack() {
       {/* Heading - aligned with max-w content */}
       <div className="mb-2">
         <div className="max-w-[var(--content-max-width)] mx-auto">
-          <h2 className="section-label">Our Tools</h2>
+          <h2 className="section-heading">Our Tools</h2>
         </div>
       </div>
 
